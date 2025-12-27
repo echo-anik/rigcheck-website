@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "rm -rf .next && npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
+  "installCommand": "rm -rf node_modules .next && npm install",
   "framework": "nextjs",
   "regions": ["sin1"],
   "env": {

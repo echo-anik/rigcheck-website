@@ -1,0 +1,6 @@
+# Vercel ignore - exclude build artifacts and caches
+.next
+node_modules
+.turbo
+.vercel
+*.log
