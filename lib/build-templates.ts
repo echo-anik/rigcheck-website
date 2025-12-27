@@ -256,11 +256,11 @@ export function matchComponentToTemplate(
   
   // Additional scoring based on specs (if available)
   if (component.specs && typeof component.specs === 'object') {
-    const specs = component.specs as Record<string, unknown>;
-    
+    const specs = component.specs as Record<string, any>;
+
     // RAM capacity matching
     if (category === 'ram' && template.targetSpecs.ramCapacityGB) {
-      const capacity = Number(specs.capacity_gb) || 0;
+      const capacity = Number(specs.capacity_gb || 0);
       if (capacity >= template.targetSpecs.ramCapacityGB) {
         score += 5;
       }
@@ -268,7 +268,7 @@ export function matchComponentToTemplate(
 
     // Storage capacity matching
     if (category === 'storage' && template.targetSpecs.storageGB) {
-      const capacity = Number(specs.capacity) || 0;
+      const capacity = Number(specs.capacity || 0);
       if (capacity >= template.targetSpecs.storageGB) {
         score += 5;
       }
@@ -276,7 +276,7 @@ export function matchComponentToTemplate(
 
     // PSU wattage matching
     if (category === 'psu' && template.targetSpecs.psuWattage) {
-      const wattage = Number(specs.wattage) || parseInt(component.name.match(/(\d{3,4})\s*W/i)?.[1] || '0');
+      const wattage = Number(specs.wattage || 0) || parseInt(component.name.match(/(\d{3,4})\s*W/i)?.[1] || '0');
       if (wattage >= template.targetSpecs.psuWattage) {
         score += 5;
       }
