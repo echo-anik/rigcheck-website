@@ -240,6 +240,7 @@ export function matchComponentToTemplate(
   template: BuildTemplate,
   category: keyof BuildTemplate['recommendations']
 ): number {
+  // Match component against template recommendations
   let score = 0;
   const recommendations = template.recommendations[category];
   
