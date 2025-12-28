@@ -119,7 +119,24 @@ export default function PCBuilderPage() {
       setBuildName(clonedName);
       sessionStorage.removeItem('clonedBuildName');
     }
-  }, []);
+
+    // Restore build from localStorage if user just logged in
+    if (isAuthenticated) {
+      const pendingBuildData = localStorage.getItem('pendingBuildData');
+      if (pendingBuildData) {
+        try {
+          const { buildName: savedBuildName, selectedComponents: savedComponents } = JSON.parse(pendingBuildData);
+          setBuildName(savedBuildName);
+          setSelectedComponents(savedComponents);
+          localStorage.removeItem('pendingBuildData');
+          toast.success('Your previous build has been restored!');
+        } catch (error) {
+          console.error('Failed to restore pending build:', error);
+          localStorage.removeItem('pendingBuildData');
+        }
+      }
+    }
+  }, [isAuthenticated]);
 
   // Load existing build for editing
   const loadExistingBuild = async (id: number) => {
@@ -297,7 +314,17 @@ export default function PCBuilderPage() {
     const { toast } = await import('sonner');
 
     if (!isAuthenticated) {
-      toast.error('Please sign in to save builds');
+      // Save build to localStorage before redirecting to login
+      const buildData = {
+        buildName,
+        selectedComponents,
+        timestamp: Date.now()
+      };
+      localStorage.setItem('pendingBuildData', JSON.stringify(buildData));
+      
+      toast.success('Build saved temporarily. Please sign in to save permanently.', {
+        description: 'Your build will be restored after you sign in.',
+      });
       router.push('/auth/signin');
       return;
     }
