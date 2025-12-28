@@ -8,6 +8,7 @@ import { ApiClient, Build } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
 import { Eye, Heart, MessageSquare, Share2, User } from 'lucide-react';
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
@@ -100,7 +101,7 @@ export default function FeedPage() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2">
             {builds.map((build) => (
-              <Card key={build.id} className="hover:shadow-lg transition-shadow">
+              <Card key={build.id} className="hover:shadow-lg transition-shadow flex flex-col">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -120,7 +121,14 @@ export default function FeedPage() {
                     {getCompatibilityBadge(build.compatibility_status)}
                   </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col h-full">
+                  {/* Build Component Images */}
+                  <BuildImageGrid
+                    components={build.components || []}
+                    buildName={build.name}
+                    className="mb-4"
+                  />
+
                   {build.description && (
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                       {build.description}
@@ -143,27 +151,8 @@ export default function FeedPage() {
                     </div>
                   </div>
 
-                  {/* Components Preview */}
-                  {build.components && build.components.length > 0 && (
-                    <div className="mb-4">
-                      <div className="text-xs text-muted-foreground mb-2">Components:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {build.components.slice(0, 5).map((comp, idx) => (
-                          <Badge key={idx} variant="outline" className="text-xs">
-                            {comp.category}
-                          </Badge>
-                        ))}
-                        {build.components.length > 5 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{build.components.length - 5} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
                   {/* Social Stats */}
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4 mb-4">
                     <div className="flex items-center gap-1">
                       <Eye className="h-4 w-4" />
                       <span>{build.view_count || 0} views</span>
@@ -180,7 +169,7 @@ export default function FeedPage() {
 
                   {/* Use Case Badge */}
                   {build.use_case && (
-                    <div className="mt-4">
+                    <div className="mb-4">
                       <Badge variant="outline" className="capitalize">
                         {build.use_case}
                       </Badge>
@@ -188,7 +177,7 @@ export default function FeedPage() {
                   )}
 
                   {/* View Details Button */}
-                  <Button asChild className="w-full mt-4">
+                  <Button asChild className="w-full mt-auto">
                     <Link href={`/builds/${build.id}`}>
                       View Build Details
                     </Link>

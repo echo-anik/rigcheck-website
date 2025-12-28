@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/auth-context';
 import { ApiClient, Build } from '@/lib/api';
+import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
 
@@ -317,23 +318,26 @@ function ProfilePageContent() {
             ) : userBuilds.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {userBuilds.map((build) => (
-                  <Card key={build.id} className="hover:shadow-lg transition-shadow h-full">
-                    <CardContent className="p-6">
-                      <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                        <span className="text-gray-400">Build Image</span>
-                      </div>
+                  <Card key={build.id} className="hover:shadow-lg transition-shadow h-full flex flex-col">
+                    <CardContent className="p-6 flex flex-col h-full">
+                      {/* Build Image Grid */}
+                      <BuildImageGrid
+                        components={build.components || []}
+                        buildName={build.name}
+                        className="mb-4"
+                      />
                       
-                      <h3 className="font-semibold mb-2 line-clamp-1">
+                      <h3 className="font-semibold mb-2 line-clamp-2 flex-shrink-0">
                         {build.name}
                       </h3>
                       
                       {build.description && (
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2 flex-shrink-0">
                           {build.description}
                         </p>
                       )}
                       
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center justify-between mb-3 flex-shrink-0">
                         <span className="text-lg font-bold text-primary">
                           {formatPrice(build.total_price)}
                         </span>
@@ -344,12 +348,12 @@ function ProfilePageContent() {
                         )}
                       </div>
                       
-                      <div className="flex gap-4 text-sm text-muted-foreground mb-4">
+                      <div className="flex gap-4 text-sm text-muted-foreground mb-4 flex-shrink-0">
                         <span>{build.is_complete ? 'Complete' : 'Incomplete'}</span>
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 mt-auto flex-shrink-0">
                         <Button
                           variant="outline"
                           size="sm"

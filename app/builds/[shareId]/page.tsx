@@ -7,6 +7,7 @@ import { ArrowLeft, Edit, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
 import { formatPriceBDT } from '@/lib/currency';
 import { ApiClient, type Build, type Component as BuilderComponent } from '@/lib/api';
 import { toast } from 'sonner';
@@ -473,6 +474,31 @@ export default function BuildDetailPage() {
             <CardTitle>Build Components</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Component Images Grid */}
+            <div className="mb-6">
+              {build.components.length > 0 ? (
+                <BuildImageGrid
+                  components={build.components.map(comp => ({
+                    id: comp.product_id,
+                    product_id: comp.product_id,
+                    name: comp.name,
+                    category: comp.category,
+                    brand: comp.brand ?? 'Unknown',
+                    model: comp.name,
+                    specs: comp.specs ?? {},
+                    lowest_price_bdt: comp.price_bdt,
+                    image_urls: comp.image ? [comp.image] : [],
+                    primary_image_url: comp.image ?? null,
+                  }))}
+                />
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                  <p className="text-muted-foreground">No components in this build</p>
+                </div>
+              )}
+            </div>
+
+            {/* Component Details */}
             {build.components.map((component, index) => (
               <div key={`${component.category}-${component.product_id}-${index}`} className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="flex-1 min-w-0">
