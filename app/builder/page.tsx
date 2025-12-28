@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { ApiClient, Component } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -114,6 +113,12 @@ export default function PCBuilderPage() {
         console.error('Failed to load pending build:', error);
       }
     }
+
+    const clonedName = sessionStorage.getItem('clonedBuildName');
+    if (clonedName) {
+      setBuildName(clonedName);
+      sessionStorage.removeItem('clonedBuildName');
+    }
   }, []);
 
   // Load existing build for editing
@@ -132,21 +137,34 @@ export default function PCBuilderPage() {
       });
       
       if (build.components && Array.isArray(build.components)) {
-        build.components.forEach((comp: any) => {
-          const category = comp.category;
-          if (category) {
-            // Create a Component object from the build component data
-            components[category] = {
-              id: comp.product_id || comp.id,
-              product_id: comp.product_id,
-              name: comp.name,
-              brand: comp.brand,
-              category: category,
-              lowest_price_bdt: comp.price_at_selection_bdt || comp.lowest_price_bdt,
-              primary_image_url: comp.primary_image_url,
-              specs: comp.specs || {},
-            } as Component;
+        build.components.forEach((comp) => {
+          const pivot = (comp as Component & {
+            pivot?: {
+              category?: string;
+              price_at_selection_bdt?: number | string | null;
+            };
+          }).pivot;
+
+          const category = pivot?.category || comp.category;
+          if (!category) {
+            return;
           }
+
+          const priceAtSelection = pivot?.price_at_selection_bdt ?? (comp as Partial<Component> & {
+            price_at_selection_bdt?: number | string | null;
+          }).price_at_selection_bdt;
+
+          components[category] = {
+            id: comp.product_id || comp.id,
+            product_id: comp.product_id,
+            name: comp.name,
+            brand: comp.brand,
+            category,
+            lowest_price_bdt: priceAtSelection || comp.lowest_price_bdt || null,
+            primary_image_url: comp.primary_image_url,
+            specs: comp.specs || {},
+            image_urls: comp.image_urls,
+          } as Component;
         });
       }
       
@@ -269,7 +287,8 @@ export default function PCBuilderPage() {
     }));
   };
 
-  const handleEditComponent = (_category: string) => {
+  const handleEditComponent = (category: string) => {
+    void category;
     // Scroll to top to show wizard
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -298,7 +317,7 @@ export default function PCBuilderPage() {
     try {
       // Build components array for API
       const components = Object.entries(selectedComponents)
-        .filter(([_, component]) => component !== null)
+        .filter(([, component]) => component !== null)
         .map(([category, component]) => {
           const price = component!.lowest_price_bdt
             ? (typeof component!.lowest_price_bdt === 'string'
@@ -368,8 +387,7 @@ export default function PCBuilderPage() {
     }
   };
 
-  const handleClearAll = async () => {
-    const { toast } = await import('sonner');
+  const handleClearAll = () => {
     const initial: Record<string, Component | null> = {};
     buildSteps.forEach(step => {
       initial[step.category] = null;
@@ -377,6 +395,9 @@ export default function PCBuilderPage() {
     setSelectedComponents(initial);
     setBuildName('');
     setCompatibility(null);
+    setBuildId(null);
+    sessionStorage.removeItem('pendingBuild');
+    sessionStorage.removeItem('clonedBuildName');
     toast.success('Build cleared');
   };
 
@@ -408,7 +429,7 @@ export default function PCBuilderPage() {
 
       // Prepare components data - API expects component IDs
       const components = Object.entries(selectedComponents)
-        .filter(([_category, component]) => component !== null)
+        .filter(([, component]) => component !== null)
         .map(([category, component]) => ({
           id: component!.product_id,
           category,

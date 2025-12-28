@@ -257,28 +257,46 @@ export function matchComponentToTemplate(
   
   // Additional scoring based on specs (if available)
   if (component.specs && typeof component.specs === 'object') {
-    const specs = component.specs as Record<string, any>;
+    const specs = component.specs as Record<string, unknown>;
+
+    const parseNumeric = (value: unknown): number | null => {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return value;
+      }
+      if (typeof value === 'string') {
+        const numeric = parseFloat(value.replace(/[^\d.]/g, ''));
+        return Number.isFinite(numeric) ? numeric : null;
+      }
+      return null;
+    };
+
+    const wattageFromName = (): number | null => {
+      const match = component.name.match(/(\d{3,4})\s*W/i);
+      if (!match) return null;
+      const parsed = parseInt(match[1], 10);
+      return Number.isFinite(parsed) ? parsed : null;
+    };
 
     // RAM capacity matching
     if (category === 'ram' && template.targetSpecs.ramCapacityGB) {
-      const capacity = Number(specs.capacity_gb || 0);
-      if (capacity >= template.targetSpecs.ramCapacityGB) {
+      const capacity = parseNumeric(specs['capacity_gb']);
+      if (capacity !== null && capacity >= template.targetSpecs.ramCapacityGB) {
         score += 5;
       }
     }
 
     // Storage capacity matching
     if (category === 'storage' && template.targetSpecs.storageGB) {
-      const capacity = Number(specs.capacity || 0);
-      if (capacity >= template.targetSpecs.storageGB) {
+      const capacity = parseNumeric(specs['capacity']);
+      if (capacity !== null && capacity >= template.targetSpecs.storageGB) {
         score += 5;
       }
     }
 
     // PSU wattage matching
     if (category === 'psu' && template.targetSpecs.psuWattage) {
-      const wattage = Number(specs.wattage || 0) || parseInt(component.name.match(/(\d{3,4})\s*W/i)?.[1] || '0');
-      if (wattage >= template.targetSpecs.psuWattage) {
+      const wattage = parseNumeric(specs['wattage']) ?? wattageFromName();
+      if (wattage !== null && wattage >= template.targetSpecs.psuWattage) {
         score += 5;
       }
     }

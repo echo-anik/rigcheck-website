@@ -58,15 +58,16 @@ export default function ComponentDetailPage() {
           text: shareText,
           url: shareUrl,
         });
-      } catch (err) {
-        console.log('Share cancelled');
+      } catch (error) {
+        console.error('Share cancelled or failed:', error);
       }
     } else {
       // Fallback: Copy to clipboard
       try {
         await navigator.clipboard.writeText(shareUrl);
         toast.success('Link copied to clipboard!');
-      } catch (err) {
+      } catch (error) {
+        console.error('Failed to copy link:', error);
         toast.error('Failed to copy link');
       }
     }

@@ -1,9 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Users, FileText, Package, Cpu } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Users, Package, Cpu } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+
+interface RecentUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface RecentBuild {
+  id: number;
+  name: string | null;
+  total_price: number | null;
+  user?: {
+    name?: string | null;
+  } | null;
+}
 
 interface Stats {
   total_users: number;
@@ -14,8 +30,8 @@ interface Stats {
   banned_users: number;
   new_users_this_month: number;
   components_by_category: Array<{ category: string; count: number }>;
-  recent_users: any[];
-  recent_builds: any[];
+  recent_users: RecentUser[];
+  recent_builds: RecentBuild[];
 }
 
 export default function AdminDashboard() {
@@ -23,11 +39,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
-  const fetchStats = async () => {
+  const fetchStats = useCallback(async () => {
     try {
       const token = localStorage.getItem('auth_token');
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1'}/admin/stats`, {
@@ -54,7 +66,11 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
 
   if (loading) {
     return <div className="text-center py-8">Loading statistics...</div>;

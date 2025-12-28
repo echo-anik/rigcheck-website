@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Search, Trash2, Eye } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,11 +22,8 @@ export default function AdminBuilds() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    fetchBuilds();
-  }, [searchTerm]);
-
-  const fetchBuilds = async () => {
+  const fetchBuilds = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
@@ -51,7 +48,11 @@ export default function AdminBuilds() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchBuilds();
+  }, [fetchBuilds]);
 
   const deleteBuild = async (buildId: number) => {
     if (!confirm('Are you sure you want to delete this build?')) {
