@@ -3,6 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
+import { BuildInteractions } from '@/components/build-interactions';
 import { Eye, Heart, Share2, Cpu, MemoryStick } from 'lucide-react';
 import type { Build } from '@/lib/api';
 
@@ -50,8 +51,10 @@ export function BuildCard({ build }: BuildCardProps) {
         <div className="relative bg-gray-100 p-3">
           {build.components && build.components.length > 0 ? (
             <BuildImageGrid
-              components={build.components}
-              buildName={build.name}
+              components={build.components.map(comp => ({
+                ...comp,
+                primary_image_url: comp.primary_image_url ?? undefined
+              }))}
             />
           ) : (
             <div className="aspect-video flex items-center justify-center bg-gray-200 rounded-lg">
@@ -105,9 +108,9 @@ export function BuildCard({ build }: BuildCardProps) {
           </div>
         </CardContent>
 
-        <CardFooter className="pt-3 flex items-center justify-between border-t">
+        <CardFooter className="pt-3 flex flex-col gap-3 border-t">
           {/* Stats */}
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center justify-between w-full gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Eye className="h-4 w-4" />
               <span>{build.is_complete ? 'Complete' : 'Incomplete'}</span>
@@ -116,27 +119,38 @@ export function BuildCard({ build }: BuildCardProps) {
               <Heart className="h-4 w-4" />
               <span>{build.visibility === 'public' ? 'Public' : 'Private'}</span>
             </div>
+
+            {/* Share Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = build.share_url || `${window.location.origin}/builds/${build.id}`;
+                if (navigator.share) {
+                  navigator.share({ title: build.name, url }).catch(() => navigator.clipboard.writeText(url));
+                } else {
+                  navigator.clipboard.writeText(url);
+                }
+              }}
+              className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+            >
+              <Share2 className="h-4 w-4 mr-1" />
+              Share
+            </Button>
           </div>
 
-          {/* Share Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const url = build.share_url || `${window.location.origin}/builds/${build.id}`;
-              if (navigator.share) {
-                navigator.share({ title: build.name, url }).catch(() => navigator.clipboard.writeText(url));
-              } else {
-                navigator.clipboard.writeText(url);
-              }
-            }}
-            className="group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-          >
-            <Share2 className="h-4 w-4 mr-1" />
-            Share
-          </Button>
+          {/* Build Interactions */}
+          <div className="w-full pt-2 border-t">
+            <BuildInteractions 
+              buildId={typeof build.id === 'string' ? parseInt(build.id, 10) : build.id}
+              canClone={true}
+              canEdit={false}
+              canDelete={false}
+              initialLikeCount={build.like_count || 0}
+            />
+          </div>
         </CardFooter>
       </Link>
     </Card>
