@@ -20,6 +20,10 @@ function ProfilePageContent() {
   const activeTab = searchParams.get('tab') || 'profile';
   const [userBuilds, setUserBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({ name: user?.name || '', bio: '' });
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({ current: '', new: '', confirm: '' });
 
   useEffect(() => {
     if (isAuthenticated && activeTab === 'builds') {
@@ -36,6 +40,82 @@ function ProfilePageContent() {
       console.error('Failed to load builds:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    const { toast } = await import('sonner');
+    try {
+      const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+      
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: profileData.name,
+          bio: profileData.bio,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Profile updated successfully!');
+        setEditingProfile(false);
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      const { toast } = await import('sonner');
+      toast.error('An error occurred while updating profile');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    const { toast } = await import('sonner');
+    
+    if (passwordData.new !== passwordData.confirm) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    if (passwordData.new.length < 8) {
+      toast.error('Password must be at least 8 characters');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+      
+      const response = await fetch(`${API_BASE_URL}/password`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          current_password: passwordData.current,
+          password: passwordData.new,
+          password_confirmation: passwordData.confirm,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Password changed successfully!');
+        setChangingPassword(false);
+        setPasswordData({ current: '', new: '', confirm: '' });
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Failed to change password:', error);
+      const { toast } = await import('sonner');
+      toast.error('An error occurred while changing password');
     }
   };
 
@@ -380,15 +460,46 @@ function ProfilePageContent() {
                 <CardTitle>Profile Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Display Name</label>
-                  <Input value={user?.name || ''} onChange={() => {}} className="mt-1" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Bio</label>
-                  <Input placeholder="Tell us about yourself" onChange={() => {}} className="mt-1" />
-                </div>
-                <Button>Save Changes</Button>
+                {editingProfile ? (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Display Name</label>
+                      <Input 
+                        value={profileData.name} 
+                        onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                        className="mt-1" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Bio</label>
+                      <Input 
+                        placeholder="Tell us about yourself" 
+                        value={profileData.bio}
+                        onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
+                        className="mt-1" 
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleUpdateProfile}>Save Changes</Button>
+                      <Button variant="outline" onClick={() => setEditingProfile(false)}>Cancel</Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Display Name</label>
+                      <Input value={user?.name || ''} disabled className="mt-1" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Bio</label>
+                      <Input placeholder="No bio yet" disabled className="mt-1" />
+                    </div>
+                    <Button onClick={() => {
+                      setProfileData({name: user?.name || '', bio: ''});
+                      setEditingProfile(true);
+                    }}>Edit Profile</Button>
+                  </>
+                )}
               </CardContent>
             </Card>
 
@@ -397,11 +508,55 @@ function ProfilePageContent() {
                 <CardTitle>Account Settings</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Email</label>
-                  <Input value={user?.email} disabled className="mt-1" />
-                </div>
-                <Button variant="outline">Change Password</Button>
+                {changingPassword ? (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Current Password</label>
+                      <Input 
+                        type="password" 
+                        placeholder="Enter current password"
+                        value={passwordData.current}
+                        onChange={(e) => setPasswordData({...passwordData, current: e.target.value})}
+                        className="mt-1" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">New Password</label>
+                      <Input 
+                        type="password" 
+                        placeholder="Enter new password (min 8 chars)"
+                        value={passwordData.new}
+                        onChange={(e) => setPasswordData({...passwordData, new: e.target.value})}
+                        className="mt-1" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Confirm New Password</label>
+                      <Input 
+                        type="password" 
+                        placeholder="Confirm new password"
+                        value={passwordData.confirm}
+                        onChange={(e) => setPasswordData({...passwordData, confirm: e.target.value})}
+                        className="mt-1" 
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleChangePassword}>Update Password</Button>
+                      <Button variant="outline" onClick={() => {
+                        setChangingPassword(false);
+                        setPasswordData({ current: '', new: '', confirm: '' });
+                      }}>Cancel</Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Email</label>
+                      <Input value={user?.email} disabled className="mt-1" />
+                    </div>
+                    <Button variant="outline" onClick={() => setChangingPassword(true)}>Change Password</Button>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>

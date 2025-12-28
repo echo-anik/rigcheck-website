@@ -50,36 +50,36 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
+          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
             <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-lg">RC</span>
             </div>
-            <span className="font-bold text-xl hidden sm:inline-block">RigCheck</span>
+            <span className="font-bold text-lg hidden sm:inline-block">RigCheck</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1 text-sm font-medium">
-            <Link href="/components" className="px-4 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
+          <nav className="hidden lg:flex items-center space-x-0 text-sm font-medium flex-1 justify-center">
+            <Link href="/components" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
               Browse Components
             </Link>
-            <Link href="/builds" className="px-4 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
+            <Link href="/builds" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
               Build Gallery
             </Link>
-            <Link href="/builder" className="px-4 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
+            <Link href="/builder" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
               PC Builder
             </Link>
-            <Link href="/feed" className="px-4 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
+            <Link href="/feed" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
               Feed
             </Link>
-            <Link href="/compare" className="px-4 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
+            <Link href="/compare" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
               Compare
             </Link>
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0">
             <Button variant="outline" size="icon" className="hidden sm:flex border" asChild>
               <Link href="/search">
                 <Search className="h-5 w-5" />
@@ -100,7 +100,7 @@ export function Header() {
             {isAuthenticated && user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hidden md:flex">
+                  <Button variant="ghost" size="icon" className="hidden lg:flex">
                     <User className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -151,7 +151,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:flex border"
+                className="hidden lg:flex border"
                 onClick={() => setShowLoginModal(true)}
               >
                 Sign In

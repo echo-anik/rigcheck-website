@@ -52,6 +52,13 @@ export default function ComponentsPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
 
+  // Reset filters and pagination when category changes
+  useEffect(() => {
+    setSelectedBrands([]);
+    setPriceRange({ min: '', max: '' });
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
   // Fetch components
   useEffect(() => {
     const fetchComponents = async () => {
