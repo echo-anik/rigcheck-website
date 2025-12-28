@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Trash2, ShoppingCart } from 'lucide-react';
-import { api, Build, Component as ApiComponent } from '@/lib/api';
+import { api, Build } from '@/lib/api';
 import { toast } from 'sonner';
 
 interface ComponentCardData {

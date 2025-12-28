@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Search, Edit, Trash2, Ban, UserCheck } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { Search, Trash2, Ban, UserCheck } from 'lucide-react';
 
 interface User {
   id: number;
@@ -21,11 +21,8 @@ export default function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState('all');
   const [banFilter, setBanFilter] = useState('all');
 
-  useEffect(() => {
-    fetchUsers();
-  }, [searchTerm, roleFilter, banFilter]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
@@ -52,7 +49,11 @@ export default function AdminUsers() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [banFilter, roleFilter, searchTerm]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const toggleBan = async (userId: number) => {
     if (!confirm('Are you sure you want to toggle ban status for this user?')) {
@@ -130,6 +131,7 @@ export default function AdminUsers() {
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by role"
           >
             <option value="all">All Roles</option>
             <option value="user">Users</option>
@@ -142,6 +144,7 @@ export default function AdminUsers() {
             value={banFilter}
             onChange={(e) => setBanFilter(e.target.value)}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Filter by ban status"
           >
             <option value="all">All Users</option>
             <option value="0">Active</option>

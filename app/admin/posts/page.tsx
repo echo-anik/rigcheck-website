@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { Search, Trash2, Star } from 'lucide-react';
 
 interface Post {
@@ -24,11 +25,8 @@ export default function AdminPosts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('all');
 
-  useEffect(() => {
-    fetchPosts();
-  }, [searchTerm, featuredFilter]);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const params = new URLSearchParams();
@@ -54,7 +52,11 @@ export default function AdminPosts() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [featuredFilter, searchTerm]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const toggleFeatured = async (postId: number) => {
     try {
@@ -171,11 +173,16 @@ export default function AdminPosts() {
               <div className="p-4">
                 <p className="text-gray-800 mb-3">{post.content}</p>
                 {post.image_url && (
-                  <img
-                    src={post.image_url}
-                    alt="Post"
-                    className="w-full rounded-lg mb-3"
-                  />
+                  <div className="relative w-full h-64 mb-3">
+                    <Image
+                      src={post.image_url}
+                      alt="Post"
+                      fill
+                      className="object-cover rounded-lg"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      priority={false}
+                    />
+                  </div>
                 )}
                 <div className="flex items-center gap-4 text-sm text-gray-500">
                   <span>{post.likes_count} likes</span>

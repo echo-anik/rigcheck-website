@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Plus, X, ArrowLeft, Search, RefreshCw } from 'lucide-react';
@@ -14,10 +14,6 @@ import { formatPriceUSD, formatPriceBDT, USD_TO_BDT_RATE } from '@/lib/currency'
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
 
-interface ComparisonSlot {
-  component: Component | null;
-}
-
 export default function ComparisonPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('cpu');
   const [comparisonSlots, setComparisonSlots] = useState<(Component | null)[]>([null, null, null]);
@@ -27,11 +23,7 @@ export default function ComparisonPage() {
   const [selectedSlotIndex, setSelectedSlotIndex] = useState<number | null>(null);
   const [showUSD, setShowUSD] = useState(false);
 
-  useEffect(() => {
-    fetchComponents();
-  }, [selectedCategory]);
-
-  const fetchComponents = async () => {
+  const fetchComponents = useCallback(async () => {
     setLoading(true);
     try {
       const response = await api.getComponents({ category: selectedCategory, per_page: 50 });
@@ -41,7 +33,11 @@ export default function ComparisonPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    fetchComponents();
+  }, [fetchComponents]);
 
   const handleSelectComponent = (component: Component, slotIndex: number) => {
     const newSlots = [...comparisonSlots];
@@ -77,12 +73,6 @@ export default function ComparisonPage() {
   const handleAddSlot = () => {
     if (comparisonSlots.length < 4) {
       setComparisonSlots([...comparisonSlots, null]);
-    }
-  };
-
-  const handleRemoveSlot = (index: number) => {
-    if (comparisonSlots.length > 2) {
-      setComparisonSlots(comparisonSlots.filter((_, i) => i !== index));
     }
   };
 
