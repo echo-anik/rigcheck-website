@@ -15,6 +15,7 @@ interface User {
 }
 
 export default function AdminUsers() {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,7 +32,7 @@ export default function AdminUsers() {
       if (banFilter !== 'all') params.append('banned', banFilter);
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/admin/users?${params}`,
+        `${API_BASE_URL}/admin/users?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -49,7 +50,7 @@ export default function AdminUsers() {
     } finally {
       setLoading(false);
     }
-  }, [banFilter, roleFilter, searchTerm]);
+  }, [banFilter, roleFilter, searchTerm, API_BASE_URL]);
 
   useEffect(() => {
     fetchUsers();
@@ -63,7 +64,7 @@ export default function AdminUsers() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:8000/api/v1/admin/users/${userId}/toggle-ban`,
+        `${API_BASE_URL}/admin/users/${userId}/toggle-ban`,
         {
           method: 'POST',
           headers: {
@@ -89,7 +90,7 @@ export default function AdminUsers() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:8000/api/v1/admin/users/${userId}`,
+        `${API_BASE_URL}/admin/users/${userId}`,
         {
           method: 'DELETE',
           headers: {
