@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, Search, User, LogOut, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { useAuth } from '@/lib/auth-context';
 import { useWishlist } from '@/lib/wishlist-context';
 import { LoginModal } from '@/components/auth/login-modal';
@@ -82,6 +83,8 @@ export function Header() {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 justify-end flex-1 lg:flex-none">
+            <ThemeToggle />
+
             <Button variant="outline" size="icon" className="hidden sm:flex border" asChild>
               <Link href="/search">
                 <Search className="h-5 w-5" />
