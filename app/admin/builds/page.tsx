@@ -18,6 +18,7 @@ interface Build {
 }
 
 export default function AdminBuilds() {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +31,7 @@ export default function AdminBuilds() {
       if (searchTerm) params.append('search', searchTerm);
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/builds?${params}`,
+        `${API_BASE_URL}/builds?${params}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -48,7 +49,7 @@ export default function AdminBuilds() {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, API_BASE_URL]);
 
   useEffect(() => {
     fetchBuilds();
@@ -62,7 +63,7 @@ export default function AdminBuilds() {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `http://localhost:8000/api/v1/builds/${buildId}`,
+        `${API_BASE_URL}/builds/${buildId}`,
         {
           method: 'DELETE',
           headers: {
