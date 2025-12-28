@@ -322,8 +322,10 @@ function ProfilePageContent() {
                     <CardContent className="p-6 flex flex-col h-full">
                       {/* Build Image Grid */}
                       <BuildImageGrid
-                        components={build.components || []}
-                        buildName={build.name}
+                        components={(build.components || []).map(comp => ({
+                          ...comp,
+                          primary_image_url: comp.primary_image_url ?? undefined
+                        }))}
                         className="mb-4"
                       />
                       

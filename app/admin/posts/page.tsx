@@ -20,6 +20,7 @@ interface Post {
 }
 
 export default function AdminPosts() {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,7 +53,7 @@ export default function AdminPosts() {
     } finally {
       setLoading(false);
     }
-  }, [featuredFilter, searchTerm]);
+  }, [featuredFilter, searchTerm, API_BASE_URL]);
 
   useEffect(() => {
     fetchPosts();

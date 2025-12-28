@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
+import { BuildInteractions } from '@/components/build-interactions';
 import { Eye, Heart, MessageSquare, Share2, User } from 'lucide-react';
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
@@ -124,8 +125,10 @@ export default function FeedPage() {
                 <CardContent className="flex flex-col h-full">
                   {/* Build Component Images */}
                   <BuildImageGrid
-                    components={build.components || []}
-                    buildName={build.name}
+                    components={(build.components || []).map(comp => ({
+                      ...comp,
+                      primary_image_url: comp.primary_image_url ?? undefined
+                    }))}
                     className="mb-4"
                   />
 
@@ -165,6 +168,17 @@ export default function FeedPage() {
                       <MessageSquare className="h-4 w-4" />
                       <span>{build.comment_count || 0} comments</span>
                     </div>
+                  </div>
+
+                  {/* Build Interactions - Likes and Comments */}
+                  <div className="mb-4 border-t pt-4">
+                    <BuildInteractions 
+                      buildId={typeof build.id === 'string' ? parseInt(build.id, 10) : build.id}
+                      canClone={true}
+                      canEdit={false}
+                      canDelete={false}
+                      initialLikeCount={build.like_count || 0}
+                    />
                   </div>
 
                   {/* Use Case Badge */}

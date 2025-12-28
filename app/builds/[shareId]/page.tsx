@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
+import { BuildInteractions } from '@/components/build-interactions';
 import { formatPriceBDT } from '@/lib/currency';
 import { ApiClient, type Build, type Component as BuilderComponent } from '@/lib/api';
 import { toast } from 'sonner';
@@ -407,7 +408,7 @@ export default function BuildDetailPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex flex-col gap-3 sm:flex-row mb-6">
               <Button onClick={handleCloneBuild} className="flex-1">
                 <Edit className="h-4 w-4 mr-2" />
                 Clone & Modify
@@ -426,6 +427,15 @@ export default function BuildDetailPage() {
                 )}
               </Button>
             </div>
+            
+            {/* Build Interactions - Likes, Comments, Actions */}
+            <BuildInteractions 
+              buildId={parseInt(build.id, 10)}
+              canClone={true}
+              canEdit={false}
+              canDelete={false}
+              onClone={handleCloneBuild}
+            />
           </CardContent>
         </Card>
 
@@ -488,7 +498,7 @@ export default function BuildDetailPage() {
                     specs: comp.specs ?? {},
                     lowest_price_bdt: comp.price_bdt,
                     image_urls: comp.image ? [comp.image] : [],
-                    primary_image_url: comp.image ?? null,
+                    primary_image_url: comp.image ?? undefined,
                   }))}
                 />
               ) : (
