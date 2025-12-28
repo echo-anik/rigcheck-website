@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ApiClient, Component } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
@@ -14,6 +15,7 @@ const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localh
 export default function PCBuilderPage() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   const [buildName, setBuildName] = useState('');
   const [buildId, setBuildId] = useState<number | null>(null);
@@ -90,11 +92,15 @@ export default function PCBuilderPage() {
     
     loadComponents();
 
-    // Load existing build for editing from session storage
-    const editingBuildId = sessionStorage.getItem('editingBuildId');
+    // Load existing build for editing from URL params (admin dashboard) or session storage
+    const buildIdParam = searchParams.get('build');
+    const editingBuildId = buildIdParam || sessionStorage.getItem('editingBuildId');
+    
     if (editingBuildId) {
       loadExistingBuild(parseInt(editingBuildId));
-      sessionStorage.removeItem('editingBuildId');
+      if (!buildIdParam) {
+        sessionStorage.removeItem('editingBuildId');
+      }
     }
 
     // Load pending build from session storage (from "Add to Build" button)
@@ -136,7 +142,7 @@ export default function PCBuilderPage() {
         }
       }
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, searchParams]);
 
   // Load existing build for editing
   const loadExistingBuild = async (id: number) => {
