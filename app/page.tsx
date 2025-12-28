@@ -14,17 +14,24 @@ async function getComponentCounts() {
           'Accept': 'application/json',
         },
         next: { revalidate: 60 }, // Cache for 60 seconds
+        cache: 'no-store', // Don't cache during build
       }
     );
-    
+
     if (response.ok) {
-      const data = await response.json();
-      return data.data;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        return data.data;
+      }
     }
   } catch (error) {
-    console.error('Failed to fetch component counts:', error);
+    // Silently fail during build time
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Failed to fetch component counts:', error);
+    }
   }
-  
+
   // Fallback counts
   return {
     cpu: 0,
