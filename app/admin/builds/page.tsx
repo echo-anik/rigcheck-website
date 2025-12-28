@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Search, Trash2, Eye } from 'lucide-react';
-import Link from 'next/link';
 
 interface Build {
   id: number;
@@ -160,13 +159,16 @@ export default function AdminBuilds() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center gap-2">
-                        <Link
-                          href={`/builder?build=${build.id}`}
+                        <button
+                          onClick={() => {
+                            sessionStorage.setItem('editingBuildId', build.id.toString());
+                            window.location.href = '/builder';
+                          }}
                           className="p-2 rounded hover:bg-gray-100 text-blue-600"
-                          title="View build"
+                          title="Edit build"
                         >
                           <Eye size={18} />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => deleteBuild(build.id)}
                           className="p-2 rounded hover:bg-gray-100 text-red-600"
