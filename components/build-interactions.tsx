@@ -209,7 +209,14 @@ export function BuildInteractions({
           <Button
             variant="outline"
             size="sm"
-            onClick={onClone}
+            onClick={() => {
+              if (onClone) {
+                onClone();
+              } else {
+                // Navigate to build detail page where clone can be done
+                router.push(`/builds/${buildId}`);
+              }
+            }}
           >
             <Copy className="h-4 w-4 mr-2" />
             Clone Build

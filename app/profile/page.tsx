@@ -35,7 +35,7 @@ function ProfilePageContent() {
   const loadUserBuilds = async () => {
     setLoading(true);
     try {
-      const response = await api.getBuilds({ is_public: false, per_page: 50 });
+      const response = await api.getMyBuilds({ per_page: 50 });
       setUserBuilds(response.data);
     } catch (error) {
       console.error('Failed to load builds:', error);
@@ -361,8 +361,8 @@ function ProfilePageContent() {
                           size="sm"
                           className="flex-1"
                           onClick={() => {
-                            sessionStorage.setItem('editingBuildId', build.id.toString());
-                            router.push('/builder');
+                            // Use URL params for better reliability
+                            router.push(`/builder?build=${build.id}`);
                           }}
                         >
                           <Edit className="h-3 w-3 mr-1" />
@@ -373,14 +373,17 @@ function ProfilePageContent() {
                           size="sm"
                           className="flex-1"
                           onClick={async () => {
-                            if (build.share_id) {
-                              const shareUrl = `${window.location.origin}/shared/${build.share_id}`;
+                            if (build.share_token || build.share_id) {
+                              const shareUrl = `${window.location.origin}/builds/${build.share_token || build.share_id}`;
                               await navigator.clipboard.writeText(shareUrl);
                               const { toast } = await import('sonner');
                               toast.success('Link copied to clipboard!');
                             } else {
+                              // Create a share link by making the build public
                               const { toast } = await import('sonner');
-                              toast.info('Creating share link...', { description: 'Please save your build first to enable sharing.' });
+                              const shareUrl = `${window.location.origin}/builds/${build.id}`;
+                              await navigator.clipboard.writeText(shareUrl);
+                              toast.success('Link copied to clipboard!');
                             }
                           }}
                         >

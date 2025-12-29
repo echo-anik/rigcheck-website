@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight, Cpu, Wrench, Shield, TrendingUp, Search } from "lucide-react";
+import { HomeSearchBar } from "@/components/home-search-bar";
 
 async function getComponentCounts() {
   try {
@@ -67,18 +67,7 @@ export default async function Home() {
 
             {/* Search Bar */}
             <div className="w-full max-w-2xl">
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Search for components (CPU, GPU, RAM...)"
-                    className="pl-10 h-12"
-                  />
-                </div>
-                <Button size="lg" className="h-12 px-8">
-                  Search
-                </Button>
-              </div>
+              <HomeSearchBar />
             </div>
 
             {/* CTA Buttons */}
