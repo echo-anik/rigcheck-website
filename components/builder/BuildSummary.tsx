@@ -54,6 +54,63 @@ export function BuildSummary({
     }, 0);
   };
 
+  const calculatePowerDraw = (): { totalWattage: number; psuWattage: number | null; percentage: number } => {
+    let totalWattage = 0;
+    
+    // Calculate power consumption for each component
+    const cpu = selectedComponents['cpu'];
+    const gpu = selectedComponents['gpu'];
+    const ram = selectedComponents['ram'];
+    const storage = selectedComponents['storage'];
+    const motherboard = selectedComponents['motherboard'];
+    const cooler = selectedComponents['cooler'];
+    
+    // CPU TDP
+    if (cpu?.specs?.tdp) {
+      totalWattage += parseFloat(String(cpu.specs.tdp));
+    } else if (cpu?.specs?.base_tdp) {
+      totalWattage += parseFloat(String(cpu.specs.base_tdp));
+    }
+    
+    // GPU TDP
+    if (gpu?.specs?.tdp) {
+      totalWattage += parseFloat(String(gpu.specs.tdp));
+    } else if (gpu?.specs?.power_consumption) {
+      totalWattage += parseFloat(String(gpu.specs.power_consumption));
+    }
+    
+    // RAM: ~3W per stick (estimate)
+    if (ram) {
+      totalWattage += 3;
+    }
+    
+    // Storage: ~5W per drive (estimate)
+    if (storage) {
+      totalWattage += 5;
+    }
+    
+    // Motherboard: ~50W (estimate)
+    if (motherboard) {
+      totalWattage += 50;
+    }
+    
+    // Cooler: ~5-10W (estimate)
+    if (cooler) {
+      totalWattage += 7;
+    }
+    
+    // Get PSU wattage
+    const psu = selectedComponents['psu'];
+    let psuWattage: number | null = null;
+    if (psu?.specs?.wattage) {
+      psuWattage = parseFloat(String(psu.specs.wattage));
+    }
+    
+    const percentage = psuWattage ? (totalWattage / psuWattage) * 100 : 0;
+    
+    return { totalWattage: Math.round(totalWattage), psuWattage, percentage };
+  };
+
   const hasMissingPrices = (): boolean => {
     return Object.values(selectedComponents).some(
       component => component !== null && !component.lowest_price_bdt
@@ -61,6 +118,7 @@ export function BuildSummary({
   };
 
   const totalPrice = calculateTotalPrice();
+  const powerDraw = calculatePowerDraw();
   const selectedCount = Object.values(selectedComponents).filter(c => c !== null).length;
 
   return (
@@ -77,6 +135,81 @@ export function BuildSummary({
           />
         </CardContent>
       </Card>
+
+      {/* Power Draw Monitor - Critical Info */}
+      {powerDraw.totalWattage > 0 && (
+        <Card className={
+          !powerDraw.psuWattage
+            ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/20'
+            : powerDraw.percentage > 100
+            ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20'
+            : powerDraw.percentage > 80
+            ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/20'
+            : 'border-green-500 bg-green-50/50 dark:bg-green-950/20'
+        }>
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium dark:text-gray-200">⚡ Power Consumption</span>
+                <span className={`text-lg font-bold ${
+                  !powerDraw.psuWattage || powerDraw.percentage > 100
+                    ? 'text-red-600 dark:text-red-400'
+                    : powerDraw.percentage > 80
+                    ? 'text-yellow-600 dark:text-yellow-400'
+                    : 'text-green-600 dark:text-green-400'
+                }`}>
+                  {powerDraw.totalWattage}W
+                </span>
+              </div>
+              
+              {powerDraw.psuWattage && (
+                <>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-gray-400">
+                    <span>PSU Capacity</span>
+                    <span className="font-semibold">{powerDraw.psuWattage}W</span>
+                  </div>
+                  
+                  {/* Progress Bar */}
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div
+                      className={`h-2.5 rounded-full transition-all ${
+                        powerDraw.percentage > 100
+                          ? 'bg-red-600'
+                          : powerDraw.percentage > 80
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                      }`}
+                      style={{ width: `${Math.min(powerDraw.percentage, 100)}%` }}
+                    />
+                  </div>
+                  
+                  <div className="text-xs text-center font-medium">
+                    {powerDraw.percentage > 100 ? (
+                      <span className="text-red-600 dark:text-red-400">
+                        ⚠️ OVER CAPACITY by {Math.round(powerDraw.percentage - 100)}%! Upgrade PSU!
+                      </span>
+                    ) : powerDraw.percentage > 80 ? (
+                      <span className="text-yellow-600 dark:text-yellow-400">
+                        ⚠️ {Math.round(powerDraw.percentage)}% load - Consider higher wattage PSU
+                      </span>
+                    ) : (
+                      <span className="text-green-600 dark:text-green-400">
+                        ✓ {Math.round(powerDraw.percentage)}% load - Good headroom
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+              
+              {!powerDraw.psuWattage && (
+                <div className="text-xs text-center text-yellow-600 dark:text-yellow-400 font-medium">
+                  ⚠️ Select a PSU to verify power compatibility
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Price Summary - Prominent */}
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
