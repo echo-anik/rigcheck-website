@@ -41,6 +41,10 @@ export default function FeedPage() {
         per_page: 50,
         is_public: true,
       });
+      
+      console.log('[Feed] API Response:', response);
+      console.log('[Feed] First build components:', response.data[0]?.components);
+      
       // Sort by most recent
       const sortedBuilds = response.data.sort((a, b) => {
         return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();

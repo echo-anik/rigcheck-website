@@ -18,6 +18,7 @@ interface BuildSummaryProps {
   onBuildNameChange: (name: string) => void;
   onSave: () => void;
   onShare?: () => Promise<{ buildId: string; buildUrl: string } | null>;
+  onShareToFeed?: () => void;
   onEdit: (category: string) => void;
   compatibility: {
     is_compatible: boolean;
@@ -33,6 +34,7 @@ export function BuildSummary({
   onBuildNameChange,
   onSave,
   onShare,
+  onShareToFeed,
   onEdit,
   compatibility,
   saving
@@ -412,6 +414,19 @@ export function BuildSummary({
           <Save className="h-4 w-4 mr-2" />
           {saving ? 'Saving...' : 'Save Build'}
         </Button>
+        
+        {onShareToFeed && (
+          <Button
+            onClick={onShareToFeed}
+            disabled={saving || selectedCount === 0 || !buildName.trim()}
+            className="w-full"
+            size="lg"
+            variant="default"
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Share to Community Feed
+          </Button>
+        )}
         
         <div className="grid grid-cols-2 gap-3">
           <Button 
