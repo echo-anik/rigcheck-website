@@ -458,6 +458,50 @@ export class ApiClient {
       data: this.normalizeBuild(response.data),
     };
   }
+
+  // ==================== SOCIAL FEATURES ====================
+
+  // Like/Unlike a build (toggle)
+  async toggleBuildLike(buildId: number): Promise<{ success: boolean; liked: boolean; like_count: number }> {
+    return this.request<{ success: boolean; liked: boolean; like_count: number }>(`/builds/${buildId}/like`, {
+      method: 'POST',
+    });
+  }
+
+  // Add comment to a build
+  async addBuildComment(buildId: number, comment: string): Promise<{ 
+    success: boolean; 
+    message?: string;
+    data: { 
+      id: number; 
+      build_id: number;
+      user_id: number;
+      comment: string;
+      user_name: string;
+      created_at: string;
+    }
+  }> {
+    return this.request(`/builds/${buildId}/comment`, {
+      method: 'POST',
+      body: JSON.stringify({ comment }),
+    });
+  }
+
+  // Get comments for a build  
+  async getBuildComments(buildId: number): Promise<{ 
+    success: boolean; 
+    data: Array<{
+      id: number;
+      build_id: number;
+      user_id: number;
+      comment: string;
+      user_name: string;
+      user_email?: string;
+      created_at: string;
+    }>
+  }> {
+    return this.request(`/builds/${buildId}/comments`);
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL);
