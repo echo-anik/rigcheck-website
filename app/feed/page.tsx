@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { ApiClient, Build, Component } from '@/lib/api';
@@ -16,22 +15,16 @@ import { toast } from 'sonner';
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
 
 export default function FeedPage() {
-  const { isAuthenticated, loading: authLoading } = useAuth();
-  const router = useRouter();
+  const { loading: authLoading } = useAuth();
   const [builds, setBuilds] = useState<Build[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Require authentication to view feed
-    if (!authLoading && !isAuthenticated) {
-      router.push('/login?redirect=/feed');
-      return;
-    }
-    
-    if (isAuthenticated) {
+    // Feed is public - anyone can view shared builds
+    if (!authLoading) {
       fetchSharedBuilds();
     }
-  }, [isAuthenticated, authLoading, router]);
+  }, [authLoading]);
 
   const fetchSharedBuilds = async () => {
     setLoading(true);
