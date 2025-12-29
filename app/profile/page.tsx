@@ -128,10 +128,10 @@ function ProfilePageContent() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-          <p className="mt-4 text-muted-foreground">Loading...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-300">Loading...</p>
         </div>
       </div>
     );
@@ -139,12 +139,12 @@ function ProfilePageContent() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <Card className="max-w-md mx-auto">
           <CardContent className="py-12 text-center">
-            <UserIcon className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Sign In Required</h2>
-            <p className="text-muted-foreground mb-6">
+            <UserIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2 dark:text-gray-100">Sign In Required</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Please sign in to view your profile
             </p>
             <Button asChild>
@@ -157,7 +157,7 @@ function ProfilePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
         <Card className="mb-8">
@@ -170,14 +170,14 @@ function ProfilePageContent() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <h1 className="text-3xl font-bold">{user?.name}</h1>
+                  <h1 className="text-3xl font-bold dark:text-gray-100">{user?.name}</h1>
                   {user?.role === 'admin' && (
                     <Badge className="bg-orange-600 hover:bg-orange-700">
                       ⚡ Admin
                     </Badge>
                   )}
                 </div>
-                <p className="text-muted-foreground mb-3">{user?.email}</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-3">{user?.email}</p>
                 <div className="flex gap-4 text-sm">
                   <span>Member since {new Date(user?.created_at || '').toLocaleDateString()}</span>
                   {user?.role === 'admin' && (
@@ -204,13 +204,13 @@ function ProfilePageContent() {
         </Card>
 
         {/* Tabs */}
-        <div className="flex gap-4 border-b mb-6 overflow-x-auto">
+        <div className="flex gap-4 border-b dark:border-gray-700 mb-6 overflow-x-auto">
           <Link
             href="/profile?tab=profile"
             className={`pb-3 px-2 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'profile'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Profile
@@ -220,7 +220,7 @@ function ProfilePageContent() {
             className={`pb-3 px-2 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'builds'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             My Builds
@@ -230,7 +230,7 @@ function ProfilePageContent() {
             className={`pb-3 px-2 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'activity'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Activity
@@ -240,7 +240,7 @@ function ProfilePageContent() {
             className={`pb-3 px-2 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'notifications'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Notifications
@@ -250,7 +250,7 @@ function ProfilePageContent() {
             className={`pb-3 px-2 border-b-2 transition-colors whitespace-nowrap ${
               activeTab === 'settings'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Settings
@@ -266,11 +266,11 @@ function ProfilePageContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Name</label>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Name</label>
                   <Input value={user?.name} disabled className="mt-1" />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Email</label>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
                   <Input value={user?.email} disabled className="mt-1" />
                 </div>
               </CardContent>
@@ -281,17 +281,17 @@ function ProfilePageContent() {
                 <CardTitle>Account Statistics</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-muted-foreground">Member Since</span>
-                  <span className="font-semibold">{user?.created_at ? new Date(user.created_at).getFullYear() : '—'}</span>
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">Member Since</span>
+                  <span className="font-semibold dark:text-gray-100">{user?.created_at ? new Date(user.created_at).getFullYear() : '—'}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b">
-                  <span className="text-muted-foreground">Status</span>
-                  <span className="font-semibold text-green-600">Active</span>
+                <div className="flex justify-between py-2 border-b dark:border-gray-700">
+                  <span className="text-gray-600 dark:text-gray-400">Status</span>
+                  <span className="font-semibold text-green-600 dark:text-green-400">Active</span>
                 </div>
                 <div className="flex justify-between py-2">
-                  <span className="text-muted-foreground">Verified</span>
-                  <span className="font-semibold">✓</span>
+                  <span className="text-gray-600 dark:text-gray-400">Verified</span>
+                  <span className="font-semibold dark:text-gray-100">✓</span>
                 </div>
               </CardContent>
             </Card>
@@ -350,7 +350,7 @@ function ProfilePageContent() {
                         )}
                       </div>
                       
-                      <div className="flex gap-4 text-sm text-muted-foreground mb-4 flex-shrink-0">
+                      <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400 mb-4 flex-shrink-0">
                         <span>{build.is_complete ? 'Complete' : 'Incomplete'}</span>
                       </div>
 
@@ -419,9 +419,9 @@ function ProfilePageContent() {
             ) : (
               <Card>
                 <CardContent className="py-12 text-center">
-                  <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold mb-2">No Builds Yet</h3>
-                  <p className="text-muted-foreground mb-6">
+                  <Package className="h-16 w-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 dark:text-gray-100">No Builds Yet</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
                     Start building your dream PC with our PC Builder tool
                   </p>
                   <Button asChild>
@@ -439,7 +439,7 @@ function ProfilePageContent() {
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-gray-600 dark:text-gray-400">
                 <p>Your recent posts, likes, and comments will appear here.</p>
                 <Button asChild className="mt-4">
                   <Link href="/feed">Go to Feed</Link>
@@ -455,7 +455,7 @@ function ProfilePageContent() {
               <CardTitle>Notifications</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-gray-600 dark:text-gray-400">
                 <p>Your notifications will appear here.</p>
               </div>
             </CardContent>
@@ -472,7 +472,7 @@ function ProfilePageContent() {
                 {editingProfile ? (
                   <>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Display Name</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Display Name</label>
                       <Input 
                         value={profileData.name} 
                         onChange={(e) => setProfileData({...profileData, name: e.target.value})}
@@ -480,7 +480,7 @@ function ProfilePageContent() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Bio</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Bio</label>
                       <Input 
                         placeholder="Tell us about yourself" 
                         value={profileData.bio}
@@ -496,11 +496,11 @@ function ProfilePageContent() {
                 ) : (
                   <>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Display Name</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Display Name</label>
                       <Input value={user?.name || ''} disabled className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Bio</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Bio</label>
                       <Input placeholder="No bio yet" disabled className="mt-1" />
                     </div>
                     <Button onClick={() => {
@@ -520,7 +520,7 @@ function ProfilePageContent() {
                 {changingPassword ? (
                   <>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Current Password</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Current Password</label>
                       <Input 
                         type="password" 
                         placeholder="Enter current password"
@@ -530,7 +530,7 @@ function ProfilePageContent() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">New Password</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">New Password</label>
                       <Input 
                         type="password" 
                         placeholder="Enter new password (min 8 chars)"
@@ -540,7 +540,7 @@ function ProfilePageContent() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-muted-foreground">Confirm New Password</label>
+                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Confirm New Password</label>
                       <Input 
                         type="password" 
                         placeholder="Confirm new password"

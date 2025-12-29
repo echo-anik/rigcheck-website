@@ -71,20 +71,20 @@ function SearchResultsContent() {
   const totalResults = activeTab === 'components' ? components.length : builds.length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
           <Link href="/" className="hover:text-primary">Home</Link>
           <span>/</span>
-          <span className="text-foreground">Search Results</span>
+          <span className="text-foreground dark:text-gray-100">Search Results</span>
         </div>
 
         {/* Search Bar */}
         <div className="mb-8">
           <form onSubmit={handleSearch} className="flex gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
               <Input
                 type="text"
                 placeholder="Search components, builds..."
@@ -99,23 +99,23 @@ function SearchResultsContent() {
 
         {query && (
           <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">
+            <h1 className="text-2xl font-bold mb-2 dark:text-gray-100">
               Search Results for &quot;{query}&quot;
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-gray-600 dark:text-gray-300">
               Found {totalResults} {activeTab}
             </p>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-4 border-b mb-6">
+        <div className="flex gap-4 border-b dark:border-gray-700 mb-6">
           <button
             onClick={() => setActiveTab('components')}
             className={`pb-3 px-2 border-b-2 transition-colors ${
               activeTab === 'components'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Components ({components.length})
@@ -125,7 +125,7 @@ function SearchResultsContent() {
             className={`pb-3 px-2 border-b-2 transition-colors ${
               activeTab === 'builds'
                 ? 'border-primary text-primary font-medium'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
+                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-foreground dark:hover:text-gray-200'
             }`}
           >
             Builds ({builds.length})
@@ -136,7 +136,7 @@ function SearchResultsContent() {
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
               <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-              <p className="mt-4 text-muted-foreground">Searching...</p>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">Searching...</p>
             </div>
           </div>
         ) : (
@@ -167,12 +167,12 @@ function SearchResultsContent() {
                               {component.category}
                             </Badge>
                             
-                            <h3 className="font-semibold mb-2 line-clamp-2">
+                            <h3 className="font-semibold mb-2 line-clamp-2 dark:text-gray-100">
                               {component.name}
                             </h3>
                             
                             {component.brand && (
-                              <p className="text-sm text-muted-foreground mb-3">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                                 {typeof component.brand === 'string' ? component.brand : component.brand_obj?.brand_name}
                               </p>
                             )}
@@ -192,7 +192,7 @@ function SearchResultsContent() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No components found matching &quot;{query}&quot;</p>
+                    <p className="text-gray-600 dark:text-gray-300">No components found matching &quot;{query}&quot;</p>
                   </div>
                 )}
               </div>
@@ -217,17 +217,17 @@ function SearchResultsContent() {
                                 className="mb-4"
                               />
                             ) : (
-                              <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                                <span className="text-gray-400">No components</span>
+                              <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg mb-4 flex items-center justify-center">
+                                <span className="text-gray-400 dark:text-gray-500">No components</span>
                               </div>
                             )}
                             
-                            <h3 className="font-semibold mb-2 line-clamp-1">
+                            <h3 className="font-semibold mb-2 line-clamp-1 dark:text-gray-100">
                               {build.name}
                             </h3>
                             
                             {build.description && (
-                              <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
                                 {build.description}
                               </p>
                             )}
@@ -241,7 +241,7 @@ function SearchResultsContent() {
                               </Badge>
                             </div>
                             
-                            <div className="flex gap-4 text-sm text-muted-foreground">
+                            <div className="flex gap-4 text-sm text-gray-600 dark:text-gray-400">
                               <span>{build.is_complete ? 'Complete' : 'Incomplete'}</span>
                             </div>
                           </CardContent>
@@ -251,7 +251,7 @@ function SearchResultsContent() {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No builds found matching &quot;{query}&quot;</p>
+                    <p className="text-gray-600 dark:text-gray-300">No builds found matching &quot;{query}&quot;</p>
                   </div>
                 )}
               </div>
@@ -262,9 +262,9 @@ function SearchResultsContent() {
         {/* No Query State */}
         {!query && !loading && (
           <div className="text-center py-12">
-            <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Start Searching</h2>
-            <p className="text-muted-foreground">
+            <Search className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2 dark:text-gray-100">Start Searching</h2>
+            <p className="text-gray-600 dark:text-gray-300">
               Enter a search term to find components and builds
             </p>
           </div>
@@ -276,7 +276,7 @@ function SearchResultsContent() {
 
 export default function SearchResultsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><p>Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center"><p className="dark:text-gray-200">Loading...</p></div>}>
       <SearchResultsContent />
     </Suspense>
   );
