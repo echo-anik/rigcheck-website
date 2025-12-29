@@ -383,6 +383,8 @@ export default function PCBuilderPage() {
         components: components
       };
 
+      console.log('[Build Save] Saving build with', components.length, 'components');
+
       // Call API to save or update build
       let response;
       if (buildId) {
@@ -398,6 +400,100 @@ export default function PCBuilderPage() {
         response = await api.createBuild(buildData);
         if (response.data?.id) {
           setBuildId(response.data.id);
+        }
+        toast.success('Build saved successfully!', {
+          description: `${buildName} has been saved to your profile.`,
+          action: {
+            label: 'View',
+            onClick: () => router.push('/profile?tab=builds'),
+          },
+        });
+      }
+      
+      console.log('[Build Save] Response:', response);
+    } catch (error) {
+      console.error('Failed to save build:', error);
+      toast.error('Failed to save build', {
+        description: error instanceof Error ? error.message : 'Please try again later.',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // New function to share build to feed
+  const handleShareToFeed = async () => {
+    const { toast } = await import('sonner');
+
+    if (!isAuthenticated) {
+      toast.error('Please sign in to share your build');
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (!buildName.trim()) {
+      toast.error('Please enter a build name');
+      return;
+    }
+
+    const selectedCount = Object.values(selectedComponents).filter(c => c !== null).length;
+    if (selectedCount === 0) {
+      toast.error('Please select at least one component');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const components = Object.entries(selectedComponents)
+        .filter(([, component]) => component !== null)
+        .map(([category, component]) => {
+          const price = component!.lowest_price_bdt
+            ? (typeof component!.lowest_price_bdt === 'string'
+                ? parseFloat(component!.lowest_price_bdt)
+                : component!.lowest_price_bdt)
+            : 0;
+
+          return {
+            component_id: component!.product_id,
+            category: category,
+            quantity: 1,
+            price_at_selection_bdt: price
+          };
+        });
+
+      const buildData = {
+        build_name: buildName.trim(),
+        description: '',
+        visibility: 'public' as 'private' | 'public',
+        components: components
+      };
+
+      let response;
+      if (buildId) {
+        response = await api.updateBuild(buildId, buildData);
+      } else {
+        response = await api.createBuild(buildData);
+        if (response.data?.id) {
+          setBuildId(response.data.id);
+        }
+      }
+
+      toast.success('Build shared to community feed!', {
+        description: `${buildName} is now visible to everyone.`,
+        action: {
+          label: 'View in Feed',
+          onClick: () => router.push('/feed'),
+        },
+      });
+    } catch (error) {
+      console.error('Failed to share build:', error);
+      toast.error('Failed to share build', {
+        description: error instanceof Error ? error.message : 'Please try again later.',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
         }
         toast.success('Build saved successfully!', {
           description: `${buildName} has been saved to your profile.`,
@@ -558,6 +654,7 @@ export default function PCBuilderPage() {
                 onBuildNameChange={setBuildName}
                 onSave={handleSaveBuild}
                 onShare={handleShareBuild}
+                onShareToFeed={handleShareToFeed}
                 onEdit={handleEditComponent}
                 compatibility={compatibility}
                 saving={saving}
