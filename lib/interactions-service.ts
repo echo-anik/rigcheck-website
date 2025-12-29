@@ -31,10 +31,10 @@ export interface BuildComment {
 }
 
 export class InteractionsService {
-  // Like/Unlike a build
-  static async toggleLikeBuild(buildId: number, token: string): Promise<{ liked: boolean }> {
+  // Like/Unlike a build (uses the correct /like endpoint)
+  static async toggleLikeBuild(buildId: number, token: string): Promise<{ liked: boolean; like_count: number }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/builds/${buildId}/toggle-like`, {
+      const response = await fetch(`${API_BASE_URL}/builds/${buildId}/like`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -48,7 +48,10 @@ export class InteractionsService {
       }
 
       const data = await response.json();
-      return { liked: data.data?.liked || data.liked || false };
+      return { 
+        liked: data.liked || false,
+        like_count: data.like_count || 0
+      };
     } catch (error) {
       console.error('Error toggling like:', error);
       throw error;
@@ -94,17 +97,17 @@ export class InteractionsService {
     }
   }
 
-  // Add comment to build
+  // Add comment to build (uses /comment endpoint, body is { comment: ... })
   static async addComment(buildId: number, content: string, token: string): Promise<BuildComment> {
     try {
-      const response = await fetch(`${API_BASE_URL}/builds/${buildId}/comments`, {
+      const response = await fetch(`${API_BASE_URL}/builds/${buildId}/comment`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ comment: content }),
       });
 
       if (!response.ok) {
@@ -112,7 +115,21 @@ export class InteractionsService {
       }
 
       const data = await response.json();
-      return data.data || data;
+      // Transform backend response to match our interface
+      const comment = data.data || data;
+      return {
+        id: comment.id,
+        build_id: comment.build_id,
+        user_id: comment.user_id,
+        user: {
+          id: comment.user_id,
+          name: comment.user_name || 'User',
+          email: comment.user_email || '',
+        },
+        content: comment.comment,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at || comment.created_at,
+      };
     } catch (error) {
       console.error('Error adding comment:', error);
       throw error;
@@ -129,7 +146,31 @@ export class InteractionsService {
       }
 
       const data = await response.json();
-      return data.data || [];
+      const rawComments = data.data || [];
+      
+      // Transform backend response to match our interface
+      return rawComments.map((comment: { 
+        id: number; 
+        build_id: number; 
+        user_id: number; 
+        comment: string; 
+        user_name?: string; 
+        user_email?: string; 
+        created_at: string; 
+        updated_at?: string 
+      }) => ({
+        id: comment.id,
+        build_id: comment.build_id,
+        user_id: comment.user_id,
+        user: {
+          id: comment.user_id,
+          name: comment.user_name || 'Anonymous',
+          email: comment.user_email || '',
+        },
+        content: comment.comment,
+        created_at: comment.created_at,
+        updated_at: comment.updated_at || comment.created_at,
+      }));
     } catch (error) {
       console.error('Error getting comments:', error);
       return [];
