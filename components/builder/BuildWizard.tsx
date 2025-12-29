@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -108,38 +108,89 @@ export function BuildWizard({
 }: BuildWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [filterBrand, setFilterBrand] = useState<string>('all');
+  const [filterChipset, setFilterChipset] = useState<string>('all');
+
+  // Debounce search query for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+    }, 150); // 150ms debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const currentStepInfo = buildSteps[currentStep];
   const progress = ((currentStep + 1) / buildSteps.length) * 100;
 
   // Get available brands for current category
-  const availableBrands = currentStepInfo
-    ? Array.from(
-        new Set(
-          (availableComponents[currentStepInfo.category] || [])
-            .map(c => c.brand)
-            .filter(Boolean)
-        )
-      ).sort()
-    : [];
+  const availableBrands = useMemo(() => {
+    if (!currentStepInfo) return [];
+    return Array.from(
+      new Set(
+        (availableComponents[currentStepInfo.category] || [])
+          .map(c => c.brand)
+          .filter(Boolean)
+      )
+    ).sort();
+  }, [currentStepInfo, availableComponents]);
 
-  // Filter components based on search and brand
-  const filteredComponents = currentStepInfo
-    ? (availableComponents[currentStepInfo.category] || []).filter(comp => {
-        const matchesSearch =
-          comp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          comp.brand?.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesBrand = filterBrand === 'all' || comp.brand === filterBrand;
-        return matchesSearch && matchesBrand;
+  // Get available chipsets for motherboard category
+  const availableChipsets = useMemo(() => {
+    if (!currentStepInfo || currentStepInfo.category !== 'motherboard') return [];
+    const chipsets = (availableComponents['motherboard'] || [])
+      .map(c => {
+        const specs = c.specs || {};
+        return typeof specs.chipset === 'string' ? specs.chipset : null;
       })
-    : [];
+      .filter((c): c is string => !!c && c.trim() !== '');
+    return Array.from(new Set(chipsets)).sort();
+  }, [currentStepInfo, availableComponents]);
+
+  // Filter components based on search and brand - memoized for performance
+  const filteredComponents = useMemo(() => {
+    if (!currentStepInfo) return [];
+    
+    const components = availableComponents[currentStepInfo.category] || [];
+    const searchLower = debouncedSearch.toLowerCase();
+    const searchTerms = searchLower.split(' ').filter(t => t.length > 0);
+    
+    return components.filter(comp => {
+      // Brand filter
+      if (filterBrand !== 'all' && comp.brand !== filterBrand) {
+        return false;
+      }
+      
+      // Chipset filter (motherboards only)
+      if (filterChipset !== 'all' && currentStepInfo.category === 'motherboard') {
+        const specs = comp.specs || {};
+        const chipset = typeof specs.chipset === 'string' ? specs.chipset : '';
+        if (chipset !== filterChipset) {
+          return false;
+        }
+      }
+      
+      // Search filter - improved multi-term search
+      if (searchTerms.length > 0) {
+        const nameLower = comp.name.toLowerCase();
+        const brandLower = (comp.brand || '').toLowerCase();
+        const combinedText = `${nameLower} ${brandLower}`;
+        
+        // Check if all search terms are found in the combined text
+        return searchTerms.every(term => combinedText.includes(term));
+      }
+      
+      return true;
+    });
+  }, [currentStepInfo, availableComponents, debouncedSearch, filterBrand, filterChipset]);
 
   const handleNext = () => {
     if (currentStep < buildSteps.length - 1) {
       setCurrentStep(currentStep + 1);
       setSearchQuery('');
       setFilterBrand('all');
+      setFilterChipset('all');
     }
   };
 
@@ -148,6 +199,7 @@ export function BuildWizard({
       setCurrentStep(currentStep - 1);
       setSearchQuery('');
       setFilterBrand('all');
+      setFilterChipset('all');
     }
   };
 
@@ -194,6 +246,7 @@ export function BuildWizard({
               setCurrentStep(index);
               setSearchQuery('');
               setFilterBrand('all');
+              setFilterChipset('all');
             }}
             className={`p-2 rounded-lg border-2 transition-all ${
               index === currentStep
@@ -343,12 +396,32 @@ export function BuildWizard({
                 <option key={brand} value={brand}>{brand}</option>
               ))}
             </select>
+            {/* Chipset filter for motherboards */}
+            {currentStepInfo.category === 'motherboard' && availableChipsets.length > 0 && (
+              <select
+                value={filterChipset}
+                onChange={(e) => setFilterChipset(e.target.value)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                aria-label="Filter by chipset"
+              >
+                <option value="all">All Chipsets</option>
+                {availableChipsets.map(chipset => (
+                  <option key={chipset} value={chipset}>{chipset}</option>
+                ))}
+              </select>
+            )}
           </div>
 
           {/* Component List */}
           <div className="max-h-[50vh] overflow-y-auto space-y-2">
             {filteredComponents.length > 0 ? (
-              filteredComponents.slice(0, 50).map((component) => (
+              <>
+                {filteredComponents.length > 100 && (
+                  <div className="text-sm text-muted-foreground mb-2 p-2 bg-blue-50 rounded">
+                    Showing first 100 of {filteredComponents.length} components. Use search or filter to narrow results.
+                  </div>
+                )}
+                {filteredComponents.slice(0, 100).map((component) => (
                 <div
                   key={component.id}
                   onClick={() => handleComponentClick(component)}
@@ -377,11 +450,100 @@ export function BuildWizard({
                       <div className="font-medium text-sm line-clamp-2">
                         {component.name}
                       </div>
-                      {component.brand && (
-                        <Badge variant="outline" className="mt-1 text-xs">
-                          {component.brand}
-                        </Badge>
-                      )}
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {component.brand && (
+                          <Badge variant="outline" className="text-xs">
+                            {component.brand}
+                          </Badge>
+                        )}
+                        {/* Show key specs based on category */}
+                        {currentStepInfo.category === 'motherboard' && component.specs && (
+                          <>
+                            {component.specs.chipset && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.chipset)}
+                              </Badge>
+                            )}
+                            {component.specs.socket && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.socket)}
+                              </Badge>
+                            )}
+                            {component.specs.form_factor && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.form_factor)}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {currentStepInfo.category === 'cpu' && component.specs && (
+                          <>
+                            {component.specs.socket && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.socket)}
+                              </Badge>
+                            )}
+                            {component.specs.cores && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.cores)} cores
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {currentStepInfo.category === 'gpu' && component.specs && (
+                          <>
+                            {component.specs.vram_gb && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.vram_gb)}GB VRAM
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {currentStepInfo.category === 'ram' && component.specs && (
+                          <>
+                            {component.specs.capacity_gb && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.capacity_gb)}GB
+                              </Badge>
+                            )}
+                            {component.specs.speed_mhz && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.speed_mhz)}MHz
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {currentStepInfo.category === 'storage' && component.specs && (
+                          <>
+                            {component.specs.capacity_gb && (
+                              <Badge variant="secondary" className="text-xs">
+                                {Number(component.specs.capacity_gb) >= 1000 
+                                  ? `${(Number(component.specs.capacity_gb) / 1000).toFixed(0)}TB` 
+                                  : `${component.specs.capacity_gb}GB`}
+                              </Badge>
+                            )}
+                            {component.specs.type && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.type)}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                        {currentStepInfo.category === 'psu' && component.specs && (
+                          <>
+                            {component.specs.wattage && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.wattage)}W
+                              </Badge>
+                            )}
+                            {component.specs.efficiency_rating && (
+                              <Badge variant="secondary" className="text-xs">
+                                {String(component.specs.efficiency_rating)}
+                              </Badge>
+                            )}
+                          </>
+                        )}
+                      </div>
                       <div className="font-bold text-primary mt-1">
                         {component.lowest_price_bdt
                           ? formatPrice(component.lowest_price_bdt)
@@ -393,7 +555,8 @@ export function BuildWizard({
                     </Button>
                   </div>
                 </div>
-              ))
+              ))}
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <p>No components found</p>

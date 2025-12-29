@@ -313,15 +313,35 @@ export class ApiClient {
   } = {}): Promise<PaginatedResponse<Build>> {
     const queryString = new URLSearchParams(
       Object.entries(params)
-        .filter(([, value]) => value !== undefined)
+        .filter(([key, value]) => value !== undefined && key !== 'is_public')
         .map(([key, value]) => [key, String(value)])
     ).toString();
 
-    // Use /builds/public endpoint for public builds
+    // Use /builds/public endpoint for public builds, /builds/my for user's builds
     const endpoint = params.is_public !== false ? '/builds/public' : '/builds/my';
     
     const response = await this.request<PaginatedResponse<Build>>(
-      `${endpoint}?${queryString}`
+      `${endpoint}${queryString ? `?${queryString}` : ''}`
+    );
+
+    return {
+      ...response,
+      data: response.data.map(b => this.normalizeBuild(b)),
+    };
+  }
+
+  async getMyBuilds(params: {
+    per_page?: number;
+    page?: number;
+  } = {}): Promise<PaginatedResponse<Build>> {
+    const queryString = new URLSearchParams(
+      Object.entries(params)
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => [key, String(value)])
+    ).toString();
+    
+    const response = await this.request<PaginatedResponse<Build>>(
+      `/builds/my${queryString ? `?${queryString}` : ''}`
     );
 
     return {
@@ -408,6 +428,35 @@ export class ApiClient {
       method: 'POST',
       body: JSON.stringify({ components }),
     });
+  }
+
+  // Share a build
+  async shareBuild(data: {
+    name: string;
+    components: Array<{
+      id: string;
+      category: string;
+      name?: string;
+      brand?: string;
+      price?: number | string | null;
+      quantity?: number;
+    }>;
+    total_price?: number;
+    compatibility?: unknown;
+  }): Promise<{ success: boolean; data: { build_id: number; share_id: string; build_url: string }; message?: string }> {
+    return this.request<{ success: boolean; data: { build_id: number; share_id: string; build_url: string }; message?: string }>('/shared-builds', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Get shared build by token
+  async getSharedBuild(shareToken: string): Promise<{ success: boolean; data: Build }> {
+    const response = await this.request<{ success: boolean; data: Build }>(`/shared-builds/${shareToken}`);
+    return {
+      ...response,
+      data: this.normalizeBuild(response.data),
+    };
   }
 }
 

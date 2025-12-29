@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { ApiClient, Build } from '@/lib/api';
+import { ApiClient, Build, Component } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
 import { BuildInteractions } from '@/components/build-interactions';
 import { Eye, Heart, MessageSquare, Share2, User } from 'lucide-react';
+import { toast } from 'sonner';
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
 
@@ -67,6 +68,43 @@ export default function FeedPage() {
       return <Badge className="bg-red-500">Errors</Badge>;
     }
   };
+
+  const handleCloneBuild = useCallback((build: Build) => {
+    const componentsForBuilder: Record<string, Partial<Component>> = {};
+
+    (build.components || []).forEach((component) => {
+      const productId = component.product_id || component.id;
+      if (!productId) {
+        return;
+      }
+
+      componentsForBuilder[component.category] = {
+        id: productId,
+        product_id: productId,
+        name: component.name,
+        category: component.category,
+        brand: component.brand ?? 'Unknown',
+        model: component.name,
+        specs: component.specs ?? {},
+        lowest_price_bdt: component.lowest_price_bdt ?? null,
+        image_urls: component.image_urls || (component.primary_image_url ? [component.primary_image_url] : []),
+        primary_image_url: component.primary_image_url ?? null,
+      };
+    });
+
+    if (Object.keys(componentsForBuilder).length === 0) {
+      toast.error('Unable to clone build', {
+        description: 'No components available to load.',
+      });
+      return;
+    }
+
+    sessionStorage.setItem('pendingBuild', JSON.stringify(componentsForBuilder));
+    sessionStorage.setItem('clonedBuildName', `${build.name || 'Unnamed Build'} (Copy)`);
+
+    router.push('/builder');
+    toast.success('Build loaded! You can modify and save it.');
+  }, [router]);
 
   if (authLoading || loading) {
     return (
@@ -178,6 +216,7 @@ export default function FeedPage() {
                       canEdit={false}
                       canDelete={false}
                       initialLikeCount={build.like_count || 0}
+                      onClone={() => handleCloneBuild(build)}
                     />
                   </div>
 

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ApiClient, Component, Build } from '@/lib/api';
+import { BuildImageGrid } from '@/components/builder/BuildImageGrid';
 
 const api = new ApiClient(process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1');
 
@@ -39,9 +40,10 @@ function SearchResultsContent() {
       });
       setComponents(componentsResponse.data);
 
-      // Search builds
+      // Search builds (with search param)
       const buildsResponse = await api.getBuilds({
         is_public: true,
+        search: searchTerm,
         per_page: 20,
       });
       setBuilds(buildsResponse.data);
@@ -205,9 +207,20 @@ function SearchResultsContent() {
                       <Link key={build.id} href={`/builds/${build.id}`}>
                         <Card className="hover:shadow-lg transition-shadow h-full">
                           <CardContent className="p-6">
-                            <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-                              <span className="text-gray-400">Build Image</span>
-                            </div>
+                            {/* Build Images Grid */}
+                            {build.components && build.components.length > 0 ? (
+                              <BuildImageGrid
+                                components={build.components.map(comp => ({
+                                  ...comp,
+                                  primary_image_url: comp.primary_image_url ?? undefined
+                                }))}
+                                className="mb-4"
+                              />
+                            ) : (
+                              <div className="aspect-video bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                                <span className="text-gray-400">No components</span>
+                              </div>
+                            )}
                             
                             <h3 className="font-semibold mb-2 line-clamp-1">
                               {build.name}
@@ -223,6 +236,9 @@ function SearchResultsContent() {
                               <span className="text-lg font-bold text-primary">
                                 {formatPrice(build.total_price)}
                               </span>
+                              <Badge variant={build.compatibility_status === 'valid' ? 'default' : 'secondary'}>
+                                {build.components?.length || 0} parts
+                              </Badge>
                             </div>
                             
                             <div className="flex gap-4 text-sm text-muted-foreground">
