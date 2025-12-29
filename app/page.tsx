@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Cpu, Wrench, Shield, TrendingUp, Search } from "lucide-react";
+import { ArrowRight, Cpu, Wrench, Shield, TrendingUp } from "lucide-react";
 import { HomeSearchBar } from "@/components/home-search-bar";
 
 async function getComponentCounts() {

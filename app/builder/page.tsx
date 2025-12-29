@@ -534,28 +534,9 @@ export default function PCBuilderPage() {
       setSaving(false);
     }
   };
-        }
-        toast.success('Build saved successfully!', {
-          description: `${buildName} has been saved to your profile.`,
-          action: {
-            label: 'View',
-            onClick: () => router.push('/profile?tab=builds'),
-          },
-        });
-      }
 
-      // Clear build after successful save
-      handleClearAll();
-    } catch (error) {
-      console.error('Failed to save build:', error);
-      toast.error('Failed to save build', {
-        description: error instanceof Error ? error.message : 'Please try again later.',
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
+  // Function to clear all components (kept for future use)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleClearAll = () => {
     const initial: Record<string, Component | null> = {};
     buildSteps.forEach(step => {
@@ -569,8 +550,6 @@ export default function PCBuilderPage() {
     sessionStorage.removeItem('clonedBuildName');
     toast.success('Build cleared');
   };
-
-
 
   const handleShareBuild = async (): Promise<{ buildId: string; buildUrl: string } | null> => {
     if (!buildName.trim()) {
