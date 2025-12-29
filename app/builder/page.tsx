@@ -346,6 +346,32 @@ export default function PCBuilderPage() {
       return;
     }
 
+    // Check for critical PSU errors
+    if (compatibility && compatibility.errors.length > 0) {
+      const psuErrors = compatibility.errors.filter(error => 
+        error.toLowerCase().includes('psu') || error.toLowerCase().includes('wattage') || error.toLowerCase().includes('power')
+      );
+      
+      if (psuErrors.length > 0) {
+        // Show big warning dialog
+        const confirmed = confirm(
+          '⚠️ CRITICAL PSU WARNING ⚠️\n\n' +
+          psuErrors.join('\n') + '\n\n' +
+          'Your PSU does not have sufficient wattage for this build. ' +
+          'This can cause system instability, crashes, or damage to components.\n\n' +
+          'We strongly recommend selecting a higher wattage PSU before saving.\n\n' +
+          'Do you want to proceed anyway? (NOT RECOMMENDED)'
+        );
+        
+        if (!confirmed) {
+          toast.error('Build not saved. Please upgrade your PSU.', {
+            description: 'Select a PSU with higher wattage for system stability.'
+          });
+          return;
+        }
+      }
+    }
+
     setSaving(true);
     try {
       // Build components array for API
@@ -440,6 +466,20 @@ export default function PCBuilderPage() {
     if (selectedCount === 0) {
       toast.error('Please select at least one component');
       return;
+    }
+
+    // Check for critical PSU errors before sharing
+    if (compatibility && compatibility.errors.length > 0) {
+      const psuErrors = compatibility.errors.filter(error => 
+        error.toLowerCase().includes('psu') || error.toLowerCase().includes('wattage') || error.toLowerCase().includes('power')
+      );
+      
+      if (psuErrors.length > 0) {
+        toast.error('\u26a0\ufe0f Cannot share build with critical PSU errors', {
+          description: 'Please fix PSU wattage issues before sharing to community.'
+        });
+        return;
+      }
     }
 
     setSaving(true);
