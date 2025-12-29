@@ -108,28 +108,28 @@ export default function FeedPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p>Loading shared builds...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <p className="dark:text-gray-200">Loading shared builds...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div className="max-w-5xl mx-auto px-4">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Community Builds Feed</h1>
-          <p className="text-gray-600">Discover PC builds shared by the RigCheck community</p>
+          <h1 className="text-3xl font-bold mb-2 dark:text-gray-100">Community Builds Feed</h1>
+          <p className="text-gray-600 dark:text-gray-300">Discover PC builds shared by the RigCheck community</p>
         </div>
 
         {/* Shared Builds Feed */}
         {builds.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
-              <Share2 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">No Shared Builds Yet</h2>
-              <p className="text-muted-foreground mb-4">
+              <Share2 className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold mb-2 dark:text-gray-100">No Shared Builds Yet</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
                 Be the first to share your PC build with the community!
               </p>
               <Button asChild>
@@ -152,7 +152,7 @@ export default function FeedPage() {
                           {build.name || 'Unnamed Build'}
                         </Link>
                       </CardTitle>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
                         <User className="h-4 w-4" />
                         <span>Shared by user</span>
                       </div>
@@ -171,7 +171,7 @@ export default function FeedPage() {
                   />
 
                   {build.description && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
                       {build.description}
                     </p>
                   )}
@@ -179,21 +179,21 @@ export default function FeedPage() {
                   {/* Build Stats */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <div className="text-sm text-muted-foreground">Total Cost</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Total Cost</div>
                       <div className="text-lg font-bold text-green-600">
                         {formatPrice(build.total_price)}
                       </div>
                     </div>
                     <div>
-                      <div className="text-sm text-muted-foreground">Components</div>
-                      <div className="text-lg font-bold">
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Components</div>
+                      <div className="text-lg font-bold dark:text-gray-100">
                         {build.components?.length || 0}
                       </div>
                     </div>
                   </div>
 
                   {/* Social Stats */}
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 border-t dark:border-gray-700 pt-4 mb-4">
                     <div className="flex items-center gap-1">
                       <Eye className="h-4 w-4" />
                       <span>{build.view_count || 0} views</span>
