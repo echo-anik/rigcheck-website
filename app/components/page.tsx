@@ -166,7 +166,7 @@ export default function ComponentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="text-sm text-muted-foreground mb-4">
@@ -230,7 +230,7 @@ export default function ComponentsPage() {
               showFilters ? 'block' : 'hidden'
             } lg:block w-full lg:w-72 space-y-6`}
           >
-            <div className="bg-white p-6 rounded-lg border shadow-sm">
+            <div className="bg-card p-6 rounded-lg border shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-bold text-lg">Filters</h2>
                 {(selectedBrands.length > 0 || priceRange.min || priceRange.max) && (
@@ -303,7 +303,7 @@ export default function ComponentsPage() {
           {/* Main Content */}
           <main className="flex-1">
             {/* Sort & View Options */}
-            <div className="bg-white p-4 rounded-lg border shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-card p-4 rounded-lg border shadow-sm mb-6 flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground">Sort by:</span>
                 <Select value={sortBy} onValueChange={setSortBy}>

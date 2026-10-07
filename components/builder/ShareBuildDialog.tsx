@@ -183,7 +183,7 @@ export function ShareBuildDialog({
               Embed on Your Website
             </h3>
             <div className="space-y-2">
-              <div className="bg-gray-50 p-3 rounded-lg border">
+              <div className="bg-muted/50 p-3 rounded-lg border">
                 <code className="text-xs break-all">{embedCode}</code>
               </div>
               <Button

@@ -343,7 +343,7 @@ export function BuildWizard({
                 </Button>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-16 h-16 bg-white rounded-lg overflow-hidden flex-shrink-0">
+                <div className="w-16 h-16 bg-muted/50 rounded-lg overflow-hidden flex-shrink-0">
                   {selectedComponents[currentStepInfo.category]!.image_urls?.[0] ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -352,7 +352,7 @@ export function BuildWizard({
                       className="w-full h-full object-contain p-2"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                       No Image
                     </div>
                   )}
@@ -427,12 +427,12 @@ export function BuildWizard({
                   onClick={() => handleComponentClick(component)}
                   className={`border-2 rounded-lg p-3 cursor-pointer transition-all hover:shadow-md hover:border-primary ${
                     selectedComponents[currentStepInfo.category]?.id === component.id
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-200'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950/30'
+                      : 'border-border'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-16 h-16 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-16 bg-muted/50 rounded-lg overflow-hidden flex-shrink-0">
                       {component.image_urls?.[0] ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -441,7 +441,7 @@ export function BuildWizard({
                           className="w-full h-full object-contain p-2"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                           No Image
                         </div>
                       )}

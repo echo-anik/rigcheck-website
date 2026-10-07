@@ -51,36 +51,38 @@ export function Header() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="w-full flex h-16 items-center justify-between px-4 md:px-6 gap-4">
+        <div className="w-full flex h-24 items-center justify-center px-4 md:px-8 gap-8 lg:gap-16">
+          
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
-            <div className="h-8 w-8 rounded bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">RC</span>
+          <Link href="/" className="flex items-center flex-shrink-0">
+            <div className="relative h-16 w-16 md:h-20 md:w-20 rounded-xl overflow-hidden shadow-sm border border-gray-200">
+              <img src="/logo.jpeg" alt="RigCheck Logo" className="object-cover w-full h-full" />
             </div>
-            <span className="font-bold text-lg hidden sm:inline-block">RigCheck</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-0 text-sm font-medium">
-            <Link href="/components" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
-              Browse Components
-            </Link>
-            <Link href="/builds" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
-              Build Gallery
-            </Link>
-            <Link href="/builder" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
-              PC Builder
-            </Link>
-            <Link href="/feed" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
-              Feed
-            </Link>
-            <Link href="/compare" className="px-3 py-2 rounded-md border border-transparent hover:border-border hover:bg-accent transition-all">
-              Compare
-            </Link>
-          </nav>
+          {/* Navigation */}
+          <div className="hidden lg:flex">
+            <nav className="flex items-center space-x-2 text-base font-medium">
+              <Link href="/components" className="px-4 py-2 rounded-md border border-transparent hover:text-blue-600 transition-colors">
+                Browse Components
+              </Link>
+              <Link href="/builds" className="px-4 py-2 rounded-md border border-transparent hover:text-blue-600 transition-colors">
+                Build Gallery
+              </Link>
+              <Link href="/builder" className="px-4 py-2 rounded-md border border-transparent hover:text-blue-600 transition-colors">
+                PC Builder
+              </Link>
+              <Link href="/feed" className="px-4 py-2 rounded-md border border-transparent hover:text-blue-600 transition-colors">
+                Feed
+              </Link>
+              <Link href="/compare" className="px-4 py-2 rounded-md border border-transparent hover:text-blue-600 transition-colors">
+                Compare
+              </Link>
+            </nav>
+          </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 justify-end">
+          {/* Actions */}
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <ThemeToggle />
 
             <Button variant="outline" size="icon" className="hidden sm:flex border" asChild>

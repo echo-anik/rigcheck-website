@@ -77,7 +77,7 @@ export default function ComparisonPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -141,7 +141,7 @@ export default function ComparisonPage() {
               <CardContent>
                 {component ? (
                   <>
-                    <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
+                    <div className="aspect-square bg-muted/50 rounded-lg mb-4 flex items-center justify-center overflow-hidden relative">
                       {component.primary_image_url || component.image_urls?.[0] ? (
                         <Image
                           src={(component.primary_image_url || component.image_urls?.[0]) as string}
@@ -177,7 +177,7 @@ export default function ComparisonPage() {
                   </>
                 ) : (
                   <>
-                    <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                    <div className="aspect-square bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                       <span className="text-4xl text-gray-400">?</span>
                     </div>
                     <Button 
@@ -196,7 +196,7 @@ export default function ComparisonPage() {
 
           {/* Add Slot Button */}
           {comparisonSlots.length < 4 && (
-            <Card className="border-dashed cursor-pointer hover:bg-gray-50 transition-colors" onClick={handleAddSlot}>
+            <Card className="border-dashed cursor-pointer hover:bg-muted/50 transition-colors" onClick={handleAddSlot}>
               <CardContent className="flex items-center justify-center h-full min-h-[400px]">
                 <div className="text-center">
                   <Plus className="h-12 w-12 text-muted-foreground mx-auto mb-3" />

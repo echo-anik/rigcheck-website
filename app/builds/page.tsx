@@ -79,7 +79,7 @@ export default function BuildsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -105,7 +105,7 @@ export default function BuildsPage() {
           {/* Search Bar */}
           <div className="flex gap-4 items-center">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search builds..."
@@ -136,7 +136,7 @@ export default function BuildsPage() {
         </div>
 
         {/* Stats Bar */}
-        <div className="bg-white rounded-lg border p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-card rounded-lg border border-border/50 p-4 mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-primary">{builds.length}</div>
             <div className="text-sm text-muted-foreground">Total Builds</div>

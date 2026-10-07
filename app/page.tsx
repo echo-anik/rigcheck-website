@@ -165,23 +165,23 @@ export default async function Home() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { name: "CPUs", count: counts.cpu, icon: "🔷", category: "cpu" },
-              { name: "Motherboards", count: counts.motherboard, icon: "🔲", category: "motherboard" },
-              { name: "GPUs", count: counts.gpu, icon: "🎮", category: "gpu" },
-              { name: "RAM", count: counts.ram, icon: "💾", category: "ram" },
-              { name: "Storage", count: counts.storage, icon: "💿", category: "storage" },
-              { name: "Power Supplies", count: counts.psu, icon: "⚡", category: "psu" },
-              { name: "Cases", count: counts.case, icon: "📦", category: "case" },
-              { name: "Coolers", count: counts.cooler, icon: "❄️", category: "cooler" },
+              { name: "CPUs", count: counts.cpu, icon: <Cpu className="w-8 h-8 mx-auto text-blue-500" />, category: "cpu" },
+              { name: "Motherboards", count: counts.motherboard, icon: <div className="w-8 h-8 mx-auto flex items-center justify-center border-2 border-blue-500 rounded-sm"><span className="w-3 h-3 bg-blue-500 rounded-sm"></span></div>, category: "motherboard" },
+              { name: "GPUs", count: counts.gpu, icon: <div className="w-8 h-8 mx-auto rounded flex items-center justify-center bg-blue-500 text-white font-bold text-[10px]">GPU</div>, category: "gpu" },
+              { name: "RAM", count: counts.ram, icon: <div className="w-3 h-8 mx-auto border-2 border-blue-500 flex items-center justify-center"><div className="w-full h-1 bg-blue-500"></div></div>, category: "ram" },
+              { name: "Storage", count: counts.storage, icon: <div className="w-8 h-3 mx-auto bg-blue-500 rounded-sm"></div>, category: "storage" },
+              { name: "Power Supplies", count: counts.psu, icon: <div className="w-8 h-8 mx-auto border-2 border-blue-500 flex items-center justify-center rounded"><span className="w-3 h-3 rounded-full bg-blue-500"></span></div>, category: "psu" },
+              { name: "Cases", count: counts.case, icon: <div className="w-6 h-8 mx-auto border-2 border-blue-500 rounded-sm"></div>, category: "case" },
+              { name: "Coolers", count: counts.cooler, icon: <div className="w-8 h-8 mx-auto rounded-full border-4 border-blue-500 border-dashed"></div>, category: "cooler" },
             ].map((category) => (
               <Link
                 key={category.category}
                 href={`/components?category=${category.category}`}
                 className="group"
               >
-                <Card className="h-full hover:border-primary transition-colors">
+                <Card className="h-full hover:border-blue-500 transition-colors">
                   <CardHeader className="text-center">
-                    <div className="text-4xl mb-2">{category.icon}</div>
+                    <div className="mb-3">{category.icon}</div>
                     <CardTitle className="text-lg">{category.name}</CardTitle>
                     <CardDescription className="text-sm">
                       {category.count.toLocaleString()} products

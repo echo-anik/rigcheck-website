@@ -75,19 +75,20 @@ export default function PCBuilderPage() {
   // Load components for each category
   useEffect(() => {
     const loadComponents = async () => {
-      const components: Record<string, Component[]> = {};
-      
-      for (const step of buildSteps) {
-        try {
-          const response = await api.getComponents({ category: step.category, per_page: 200 });
-          components[step.category] = response.data;
-        } catch (error) {
-          console.error(`Failed to load ${step.category}:`, error);
+      try {
+        const response = await api.getBuilderComponents();
+        setAvailableComponents(response.data);
+      } catch (error) {
+        console.error('Failed to load builder components:', error);
+        toast.error('Failed to load components. Please refresh the page.');
+        
+        // Fallback initialization just in case
+        const components: Record<string, Component[]> = {};
+        for (const step of buildSteps) {
           components[step.category] = [];
         }
+        setAvailableComponents(components);
       }
-      
-      setAvailableComponents(components);
     };
     
     loadComponents();
@@ -593,33 +594,21 @@ export default function PCBuilderPage() {
         component_count: components.length
       });
 
-      // Call API to create shared build
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1'}/shared-builds`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: buildName.trim(),
-          components,
-          total_price: totalCost,
-          compatibility
-        }),
+      // Call API to create shared build using the centralized ApiClient
+      const response = await api.shareBuild({
+        name: buildName.trim(),
+        components,
+        total_price: totalCost,
+        compatibility
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to create share link');
-      }
-
-      const data = await response.json();
 
       toast.success('Share link created!', {
         description: 'Your build is ready to share with others.',
       });
 
       return {
-        buildId: data.data.share_id,
-        buildUrl: data.data.build_url
+        buildId: response.data.share_id,
+        buildUrl: response.data.build_url
       };
     } catch (error) {
       console.error('Failed to create share link:', error);
@@ -631,7 +620,7 @@ export default function PCBuilderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">

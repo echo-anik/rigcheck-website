@@ -71,7 +71,7 @@ function SearchResultsContent() {
   const totalResults = activeTab === 'components' ? components.length : builds.length;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-6">
@@ -150,7 +150,7 @@ function SearchResultsContent() {
                       <Link key={component.id} href={`/components/${component.id}`}>
                         <Card className="hover:shadow-lg transition-shadow h-full">
                           <CardContent className="p-6">
-                            <div className="aspect-square bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+                            <div className="aspect-square bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                               <span className="text-4xl">
                                 {component.category === 'cpu' && '🖥️'}
                                 {component.category === 'motherboard' && '🔲'}
@@ -217,7 +217,7 @@ function SearchResultsContent() {
                                 className="mb-4"
                               />
                             ) : (
-                              <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg mb-4 flex items-center justify-center">
+                              <div className="aspect-video bg-muted/50 rounded-lg mb-4 flex items-center justify-center">
                                 <span className="text-gray-400 dark:text-gray-500">No components</span>
                               </div>
                             )}
@@ -276,7 +276,7 @@ function SearchResultsContent() {
 
 export default function SearchResultsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center"><p className="dark:text-gray-200">Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><p className="text-muted-foreground">Loading...</p></div>}>
       <SearchResultsContent />
     </Suspense>
   );

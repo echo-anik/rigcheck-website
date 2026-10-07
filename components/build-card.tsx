@@ -48,7 +48,7 @@ export function BuildCard({ build }: BuildCardProps) {
     <Card className="group hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
       <Link href={`/builds/${build.id}`} className="flex-1 flex flex-col">
         {/* Build Images Grid */}
-        <div className="relative bg-gray-100 p-3">
+        <div className="relative bg-muted/50 p-3">
           {build.components && build.components.length > 0 ? (
             <BuildImageGrid
               components={build.components.map(comp => ({
@@ -57,7 +57,7 @@ export function BuildCard({ build }: BuildCardProps) {
               }))}
             />
           ) : (
-            <div className="aspect-video flex items-center justify-center bg-gray-200 rounded-lg">
+            <div className="aspect-video flex items-center justify-center bg-muted/70 rounded-lg">
               <div className="text-center">
                 <Cpu className="h-16 w-16 mx-auto mb-2 text-primary/40" />
                 <p className="text-sm text-muted-foreground">No Components</p>

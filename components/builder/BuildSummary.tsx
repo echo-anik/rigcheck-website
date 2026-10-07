@@ -54,7 +54,7 @@ export function BuildSummary({
     }, 0);
   };
 
-  const calculatePowerDraw = (): { totalWattage: number; psuWattage: number | null; percentage: number } => {
+  const calculatePowerDraw = (): { totalWattage: number; psuWattage: number | null; percentage: number; recommendedPsu: number | null } => {
     let totalWattage = 0;
     
     // Calculate power consumption for each component
@@ -65,39 +65,16 @@ export function BuildSummary({
     const motherboard = selectedComponents['motherboard'];
     const cooler = selectedComponents['cooler'];
     
-    // CPU TDP
-    if (cpu?.specs?.tdp) {
-      totalWattage += parseFloat(String(cpu.specs.tdp));
-    } else if (cpu?.specs?.base_tdp) {
-      totalWattage += parseFloat(String(cpu.specs.base_tdp));
-    }
     
-    // GPU TDP
-    if (gpu?.specs?.tdp) {
-      totalWattage += parseFloat(String(gpu.specs.tdp));
-    } else if (gpu?.specs?.power_consumption) {
-      totalWattage += parseFloat(String(gpu.specs.power_consumption));
-    }
-    
-    // RAM: ~3W per stick (estimate)
-    if (ram) {
-      totalWattage += 3;
-    }
-    
-    // Storage: ~5W per drive (estimate)
-    if (storage) {
-      totalWattage += 5;
-    }
-    
-    // Motherboard: ~50W (estimate)
-    if (motherboard) {
-      totalWattage += 50;
-    }
-    
-    // Cooler: ~5-10W (estimate)
-    if (cooler) {
-      totalWattage += 7;
-    }
+    Object.values(selectedComponents).forEach(component => {
+      if (component) {
+        const specs = component.specs as Record<string, unknown>;
+        const tdp = specs?.tdp || specs?.power_consumption || specs?.base_tdp || 0;
+        if (tdp) {
+          totalWattage += parseFloat(String(tdp).replace(/[^0-9.]/g, ''));
+        }
+      }
+    });
     
     // Get PSU wattage
     const psu = selectedComponents['psu'];
@@ -108,7 +85,10 @@ export function BuildSummary({
     
     const percentage = psuWattage ? (totalWattage / psuWattage) * 100 : 0;
     
-    return { totalWattage: Math.round(totalWattage), psuWattage, percentage };
+    // Match backend compatibility logic for recommended PSU wattage
+    const recommendedPsu = Math.ceil((totalWattage + 150) * 1.2);
+    
+    return { totalWattage: Math.round(totalWattage), psuWattage, percentage, recommendedPsu };
   };
 
   const hasMissingPrices = (): boolean => {
@@ -141,7 +121,7 @@ export function BuildSummary({
         <Card className={
           !powerDraw.psuWattage
             ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/20'
-            : powerDraw.percentage > 100
+            : powerDraw.percentage > 100 || (powerDraw.recommendedPsu && powerDraw.psuWattage < powerDraw.recommendedPsu)
             ? 'border-red-500 bg-red-50/50 dark:bg-red-950/20'
             : powerDraw.percentage > 80
             ? 'border-yellow-500 bg-yellow-50/50 dark:bg-yellow-950/20'
@@ -150,9 +130,9 @@ export function BuildSummary({
           <CardContent className="p-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium dark:text-gray-200">⚡ Power Consumption</span>
+                <span className="text-sm font-medium">⚡ Power Consumption</span>
                 <span className={`text-lg font-bold ${
-                  !powerDraw.psuWattage || powerDraw.percentage > 100
+                  !powerDraw.psuWattage || powerDraw.percentage > 100 || (powerDraw.recommendedPsu && powerDraw.psuWattage < powerDraw.recommendedPsu)
                     ? 'text-red-600 dark:text-red-400'
                     : powerDraw.percentage > 80
                     ? 'text-yellow-600 dark:text-yellow-400'
@@ -164,13 +144,13 @@ export function BuildSummary({
               
               {powerDraw.psuWattage && (
                 <>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground dark:text-gray-400">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>PSU Capacity</span>
                     <span className="font-semibold">{powerDraw.psuWattage}W</span>
                   </div>
                   
                   {/* Progress Bar */}
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                  <div className="w-full bg-muted rounded-full h-2.5">
                     <div
                       className={`h-2.5 rounded-full transition-all ${
                         powerDraw.percentage > 100
@@ -183,18 +163,25 @@ export function BuildSummary({
                     />
                   </div>
                   
-                  <div className="text-xs text-center font-medium">
+                  <div className="text-xs text-center font-medium mt-2">
                     {powerDraw.percentage > 100 ? (
-                      <span className="text-red-600 dark:text-red-400">
-                        ⚠️ OVER CAPACITY by {Math.round(powerDraw.percentage - 100)}%! Upgrade PSU!
+                      <span className="text-red-600 dark:text-red-400 flex flex-col gap-1">
+                        <span>⚠️ OVER CAPACITY by {Math.round(powerDraw.percentage - 100)}%! Upgrade PSU!</span>
+                        {powerDraw.recommendedPsu && <span>System Requires at least {powerDraw.recommendedPsu}W</span>}
+                      </span>
+                    ) : powerDraw.recommendedPsu && powerDraw.psuWattage < powerDraw.recommendedPsu ? (
+                      <span className="text-red-600 dark:text-red-400 flex flex-col gap-1">
+                        <span>⚠️ PSU ({powerDraw.psuWattage}W) is below system recommended ({powerDraw.recommendedPsu}W)!</span>
                       </span>
                     ) : powerDraw.percentage > 80 ? (
-                      <span className="text-yellow-600 dark:text-yellow-400">
-                        ⚠️ {Math.round(powerDraw.percentage)}% load - Consider higher wattage PSU
+                      <span className="text-yellow-600 dark:text-yellow-400 flex flex-col gap-1">
+                        <span>⚠️ {Math.round(powerDraw.percentage)}% load - Consider higher wattage PSU</span>
+                        {powerDraw.recommendedPsu && <span>System Recommended: {powerDraw.recommendedPsu}W</span>}
                       </span>
                     ) : (
-                      <span className="text-green-600 dark:text-green-400">
-                        ✓ {Math.round(powerDraw.percentage)}% load - Good headroom
+                      <span className="text-green-600 dark:text-green-400 flex flex-col gap-1">
+                        <span>✓ {Math.round(powerDraw.percentage)}% load - Good headroom</span>
+                        {powerDraw.recommendedPsu && <span>System Recommended: {powerDraw.recommendedPsu}W (Met)</span>}
                       </span>
                     )}
                   </div>
@@ -215,11 +202,11 @@ export function BuildSummary({
       <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">
           <div className="text-center">
-            <div className="text-sm text-muted-foreground dark:text-gray-400 mb-1">Total Cost</div>
+            <div className="text-sm text-muted-foreground mb-1">Total Cost</div>
             <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
               {formatPriceBDT(totalPrice)}
             </div>
-            <div className="text-sm text-muted-foreground dark:text-gray-400 mt-1">
+            <div className="text-sm text-muted-foreground mt-1">
               ~${convertBDTtoUSD(totalPrice)?.toFixed(0) || '0'}
             </div>
             {hasMissingPrices() && (
@@ -303,13 +290,13 @@ export function BuildSummary({
                 <div className="flex items-center gap-2">
                   <span className="text-base">{step.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-medium text-muted-foreground dark:text-gray-400">{step.label}</div>
+                    <div className="text-xs font-medium text-muted-foreground">{step.label}</div>
                     {component ? (
-                      <div className="text-sm font-medium truncate dark:text-gray-200">
+                      <div className="text-sm font-medium truncate">
                         {component.name.length > 35 ? component.name.substring(0, 35) + '...' : component.name}
                       </div>
                     ) : (
-                      <div className="text-xs text-gray-400 dark:text-gray-500">Click to select</div>
+                      <div className="text-xs text-muted-foreground/70">Click to select</div>
                     )}
                   </div>
                   {component && component.lowest_price_bdt && (

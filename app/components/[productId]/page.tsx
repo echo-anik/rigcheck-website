@@ -112,7 +112,7 @@ export default function ComponentDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
           <p className="mt-4 text-muted-foreground">Loading component...</p>
@@ -123,7 +123,7 @@ export default function ComponentDetailPage() {
 
   if (error || !component) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-2">Component Not Found</h2>
@@ -137,7 +137,7 @@ export default function ComponentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
@@ -166,7 +166,7 @@ export default function ComponentDetailPage() {
             <Card>
               <CardContent className="p-6">
                 {/* Component Image */}
-                <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center mb-6 overflow-hidden relative">
+                <div className="aspect-square bg-muted/50 rounded-lg flex items-center justify-center mb-6 overflow-hidden relative">
                   {component.primary_image_url || component.image_urls?.[0] ? (
                     <Image
                       src={(component.primary_image_url || component.image_urls?.[0]) as string}

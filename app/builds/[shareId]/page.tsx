@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Edit, Copy, Check } from 'lucide-react';
+import { ArrowLeft, Edit, Copy, Check, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -351,7 +351,7 @@ export default function BuildDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
           <p className="mt-4 text-muted-foreground">Loading build...</p>
@@ -362,7 +362,7 @@ export default function BuildDetailPage() {
 
   if (!build) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Build Not Found</h2>
           <p className="text-muted-foreground mb-6">The build you are looking for does not exist or has been removed.</p>
@@ -375,7 +375,7 @@ export default function BuildDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Button variant="ghost" asChild className="mb-6">
           <Link href="/builder">
@@ -452,10 +452,10 @@ export default function BuildDetailPage() {
             }`}
           >
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="flex items-center gap-2">
                 {build.compatibility.is_compatible && build.compatibility.errors.length === 0
-                  ? '✅ Compatible Build'
-                  : '⚠️ Compatibility Issues'}
+                  ? <><CheckCircle2 className="w-5 h-5 text-green-500" /> Compatible Build</>
+                  : <><AlertTriangle className="w-5 h-5 text-yellow-500" /> Compatibility Issues</>}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -502,7 +502,7 @@ export default function BuildDetailPage() {
                   }))}
                 />
               ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-lg">
+                <div className="text-center py-8 bg-muted/30 rounded-lg border border-border/50">
                   <p className="text-muted-foreground">No components in this build</p>
                 </div>
               )}
@@ -510,7 +510,7 @@ export default function BuildDetailPage() {
 
             {/* Component Details */}
             {build.components.map((component, index) => (
-              <div key={`${component.category}-${component.product_id}-${index}`} className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg">
+              <div key={`${component.category}-${component.product_id}-${index}`} className="flex items-center justify-between gap-4 p-4 bg-muted/30 border border-border/50 rounded-lg transition-colors hover:bg-muted/50">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-muted-foreground mb-1 truncate">{component.category}</p>
                   <p className="font-semibold break-words">{component.name}</p>

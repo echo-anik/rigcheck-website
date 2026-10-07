@@ -172,7 +172,7 @@ export function BuildInteractions({
           size="sm"
           onClick={handleLike}
           disabled={loading}
-          className={liked ? 'bg-red-50 border-red-200' : ''}
+          className={liked ? 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-900' : ''}
         >
           <Heart className={`h-4 w-4 mr-2 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
           <span>{likeCount} Likes</span>
@@ -291,7 +291,7 @@ export function BuildInteractions({
                 </p>
               ) : (
                 comments.map((comment) => (
-                  <div key={comment.id} className="border-l-2 border-gray-200 pl-4 py-2">
+                  <div key={comment.id} className="border-l-2 border-border pl-4 py-2">
                     <div className="flex items-start justify-between">
                       <div>
                         <p className="font-medium text-sm">{comment.user?.name || 'Anonymous'}</p>
@@ -308,7 +308,7 @@ export function BuildInteractions({
                         </button>
                       )}
                     </div>
-                    <p className="text-sm text-gray-700 mt-2">{comment.content}</p>
+                    <p className="text-sm text-foreground mt-2">{comment.content}</p>
                   </div>
                 ))
               )}

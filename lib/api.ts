@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1/web';
 
 const DEMO_IMAGES = Array.from({ length: 26 }, (_, i) => `/demo-images/image (${i + 1}).jpg`);
 
@@ -250,6 +250,20 @@ export class ApiClient {
   }
 
   // Components
+  async getBuilderComponents(): Promise<{ success: boolean; data: Record<string, Component[]> }> {
+    const response = await this.request<{ success: boolean; data: Record<string, Component[]> }>(
+      `/components/builder-data`
+    );
+    
+    // Normalize components
+    const normalizedData: Record<string, Component[]> = {};
+    for (const [category, components] of Object.entries(response.data)) {
+      normalizedData[category] = components.map(c => this.normalizeComponent(c));
+    }
+    
+    return { ...response, data: normalizedData };
+  }
+
   async getComponents(params: {
     category?: string;
     brand_id?: number;
